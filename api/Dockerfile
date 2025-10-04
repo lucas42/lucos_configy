@@ -1,12 +1,9 @@
 FROM rust:1.90.0-alpine3.22 AS build
 WORKDIR /usr/src/lucos_configy_api
 
-RUN apk add --no-cache musl-dev pkgconfig openssl-dev
+RUN apk add --no-cache musl-dev pkgconfig
 
-# Leverage Docker caching by only building dependencies before copying in real source
 COPY Cargo.toml ./
-RUN mkdir src && echo "fn main() {}" > src/main.rs && cargo build --release || true
-
 COPY src ./src
 RUN cargo build --release
 
