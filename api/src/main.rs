@@ -1,0 +1,76 @@
+use axum::{
+	response::IntoResponse,
+	routing::get,
+	Json, Router,
+	http::{HeaderMap, HeaderValue, StatusCode},
+};
+use serde::Serialize;
+use std::{env, net::SocketAddr};
+use tokio::signal;
+
+#[derive(Serialize)]
+struct HealthResponse {
+	status: &'static str,
+}
+
+// GET /
+async fn root() -> impl IntoResponse {
+	"Hello World"
+}
+
+// GET /health
+async fn health() -> impl IntoResponse {
+	let mut headers = HeaderMap::new();
+	headers.insert("X-App-Version", HeaderValue::from_static("1.0"));
+	let json = Json(HealthResponse { status: "ok" });
+	(StatusCode::OK, headers, json)
+}
+
+// Wait for SIGINT or SIGTERM
+async fn shutdown_signal() {
+	let ctrl_c = async {
+		signal::ctrl_c()
+			.await
+			.expect("failed to install Ctrl+C handler");
+	};
+
+	#[cfg(unix)]
+	let terminate = async {
+		signal::unix::signal(signal::unix::SignalKind::terminate())
+			.expect("failed to install signal handler")
+			.recv()
+			.await;
+	};
+
+	#[cfg(not(unix))]
+	let terminate = std::future::pending::<()>();
+
+	tokio::select! {
+		_ = ctrl_c => {},
+		_ = terminate => {},
+	}
+
+	println!("Signal received, starting graceful shutdown...");
+}
+
+#[tokio::main]
+async fn main() {
+	let port: u16 = env::var("PORT")
+		.ok()
+		.and_then(|p| p.parse().ok())
+		.unwrap_or(3000);
+
+	let app = Router::new()
+		.route("/", get(root))
+		.route("/health", get(health));
+
+	let addr = SocketAddr::from(([0, 0, 0, 0], port));
+	println!("Listening on {}", addr);
+
+	let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+
+	axum::serve(listener, app)
+		.with_graceful_shutdown(shutdown_signal())
+		.await
+		.unwrap();
+}
