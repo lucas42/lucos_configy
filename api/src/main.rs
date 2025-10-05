@@ -9,20 +9,35 @@ use std::{env, net::SocketAddr};
 use tokio::signal;
 
 #[derive(Serialize)]
-struct HealthResponse {
-	status: &'static str,
+struct InfoCI {
+	circle: &'static str,
 }
 
-// GET /
+#[derive(Serialize)]
+struct InfoResponse {
+	system: &'static str,
+	title: &'static str,
+	network_only: bool,
+	show_on_homepage: bool,
+	ci: InfoCI,
+}
+
 async fn root() -> impl IntoResponse {
 	"Hello World"
 }
 
-// GET /health
-async fn health() -> impl IntoResponse {
+async fn info() -> impl IntoResponse {
 	let mut headers = HeaderMap::new();
 	headers.insert("X-App-Version", HeaderValue::from_static("1.0"));
-	let json = Json(HealthResponse { status: "ok" });
+	let json = Json(InfoResponse {
+		system: "lucos_configy",
+		title: "LucOS Configy",
+		ci: InfoCI {
+			circle: "gh/lucas42/lucos_configy",
+		},
+		network_only: true,
+		show_on_homepage: false,
+	});
 	(StatusCode::OK, headers, json)
 }
 
@@ -62,7 +77,7 @@ async fn main() {
 
 	let app = Router::new()
 		.route("/", get(root))
-		.route("/health", get(health));
+		.route("/_info", get(info));
 
 	let addr = SocketAddr::from(([0, 0, 0, 0], port));
 	println!("Listening on {}", addr);
