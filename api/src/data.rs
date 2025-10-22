@@ -1,11 +1,15 @@
 use serde_yaml_ng;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
+use std::vec::Vec;
 use std::path::Path;
 
-#[derive(Serialize, Deserialize)]
-struct System {
-
+#[derive(Serialize, Deserialize, Clone)]
+pub struct System {
+	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
+	domain: String,
+	http_port: u16, // TCP ports are 16-bit integers
+	hosts: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -40,5 +44,14 @@ impl Data {
 	}
 	pub fn host_count(&self) -> usize {
 		self.hosts.keys().len()
+	}
+	pub fn get_systems(&self) -> Vec<System> {
+		let mut systems = vec![];
+		for (id, orig_system) in (&self.systems).into_iter() {
+			let mut system = orig_system.clone();
+			system.id = Some(id.to_string());
+			systems.push(system);
+		}
+		systems
 	}
 }

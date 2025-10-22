@@ -1,5 +1,6 @@
 mod data;
 mod info;
+mod systems;
 
 use axum::{
 	response::IntoResponse,
@@ -63,6 +64,7 @@ async fn main() {
 	let app = Router::new()
 		.route("/", get(root))
 		.route("/_info", get(crate::info::controller))
+		.route("/systems", get(crate::systems::controller))
 		.with_state(arc_data);
 
 	let addr = SocketAddr::from(([0, 0, 0, 0], port));
