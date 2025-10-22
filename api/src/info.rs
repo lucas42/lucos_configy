@@ -17,7 +17,7 @@ struct InfoCI {
 #[serde(rename_all = "camelCase")]
 struct Metric {
 	tech_detail: &'static str,
-	value: f64,
+	value: u8,
 }
 
 #[derive(Serialize)]
@@ -39,15 +39,15 @@ pub async fn controller(
 	let mut metrics = HashMap::new();
 	metrics.insert("system-count", Metric {
 		tech_detail: "The total number of systems configured",
-		value: data.system_count() as f64,
+		value: data.system_count() as u8,
 	});
 	metrics.insert("volume-count", Metric {
 		tech_detail: "The total number of volumes configured",
-		value: data.volume_count() as f64,
+		value: data.volume_count() as u8,
 	});
 	metrics.insert("host-count", Metric {
 		tech_detail: "The total number of hosts configured",
-		value: data.host_count() as f64,
+		value: data.host_count() as u8,
 	});
 	let json = Json(InfoResponse {
 		system: "lucos_configy",
