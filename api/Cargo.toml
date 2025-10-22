@@ -10,9 +10,10 @@ axum = "0.8"
 # Tokio async runtime (required by Axum)
 tokio = { version = "1", features = ["full"] }
 
-# For JSON serialization/deserialization
+# For serialization/deserialization
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+serde_yaml_ng = "0.9"
 
 # (Optional) for HTTP constants like StatusCode, HeaderValue
 http = "1"

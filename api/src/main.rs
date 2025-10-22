@@ -1,3 +1,4 @@
+mod data;
 mod info;
 
 use axum::{
@@ -42,6 +43,15 @@ async fn shutdown_signal() {
 
 #[tokio::main]
 async fn main() {
+	match crate::data::Data::from_file("config.yaml") {
+		Ok(data) => {
+			println!("Loaded {} systems; {} volumes; {} hosts", data.systemCount(), data.volumeCount(), data.hostCount());
+		}
+		Err(err) => {
+			println!("Failed to load config, ({:?})", err);
+		}
+	}
+
 	let port: u16 = env::var("PORT")
 		.ok()
 		.and_then(|p| p.parse().ok())
