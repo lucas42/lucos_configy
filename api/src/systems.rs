@@ -15,33 +15,18 @@ pub async fn subdomain(
 	Path(root_domain): Path<String>,
 	State(data): State<Arc<crate::data::Data>>,
 ) -> impl IntoResponse {
-	let filtered_systems: Vec<crate::data::System> = data.get_systems()
-		.iter()
-		.filter(|system| system.domain.as_ref().is_some_and(|domain| domain.ends_with(&root_domain)))
-		.cloned()
-		.collect();
-	Json(filtered_systems)
+	Json(data.get_systems_filtered(|system| system.domain.as_ref().is_some_and(|domain| domain.ends_with(&root_domain))))
 }
 
 pub async fn http(
 	State(data): State<Arc<crate::data::Data>>,
 ) -> impl IntoResponse {
-	let filtered_systems: Vec<crate::data::System> = data.get_systems()
-		.iter()
-		.filter(|system| system.http_port.is_some())
-		.cloned()
-		.collect();
-	Json(filtered_systems)
+	Json(data.get_systems_filtered(|system| system.http_port.is_some()))
 }
 
 pub async fn host(
 	Path(host): Path<String>,
 	State(data): State<Arc<crate::data::Data>>,
 ) -> impl IntoResponse {
-	let filtered_systems: Vec<crate::data::System> = data.get_systems()
-		.iter()
-		.filter(|system| system.hosts.contains(&host))
-		.cloned()
-		.collect();
-	Json(filtered_systems)
+	Json(data.get_systems_filtered(|system| system.hosts.contains(&host)))
 }

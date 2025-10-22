@@ -56,4 +56,13 @@ impl Data {
 		}
 		systems
 	}
+	pub fn get_systems_filtered<P>(&self, predicate: P) -> Vec<System>
+	where
+		P: Fn(&System) -> bool,
+	{
+		self.get_systems()
+			.into_iter()
+			.filter(predicate)
+			.collect()
+	}
 }
