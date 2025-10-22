@@ -8,6 +8,7 @@ use axum::{
 };
 use std::{env, net::SocketAddr};
 use tokio::signal;
+use std::sync::Arc;
 
 
 async fn root() -> impl IntoResponse {
@@ -43,12 +44,14 @@ async fn shutdown_signal() {
 
 #[tokio::main]
 async fn main() {
+	let arc_data;
 	match crate::data::Data::from_file("config.yaml") {
 		Ok(data) => {
 			println!("Loaded {} systems; {} volumes; {} hosts", data.systemCount(), data.volumeCount(), data.hostCount());
+			arc_data = Arc::new(data);
 		}
 		Err(err) => {
-			println!("Failed to load config, ({:?})", err);
+			panic!("Failed to load config, ({:?})", err);
 		}
 	}
 
@@ -59,7 +62,8 @@ async fn main() {
 
 	let app = Router::new()
 		.route("/", get(root))
-		.route("/_info", get(crate::info::controller));
+		.route("/_info", get(crate::info::controller))
+		.with_state(arc_data);
 
 	let addr = SocketAddr::from(([0, 0, 0, 0], port));
 	println!("Listening on {}", addr);
