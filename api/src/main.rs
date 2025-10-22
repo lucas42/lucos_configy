@@ -1,44 +1,16 @@
+mod info;
+
 use axum::{
 	response::IntoResponse,
 	routing::get,
-	Json, Router,
-	http::{HeaderMap, HeaderValue, StatusCode},
+	Router,
 };
-use serde::Serialize;
 use std::{env, net::SocketAddr};
 use tokio::signal;
 
-#[derive(Serialize)]
-struct InfoCI {
-	circle: &'static str,
-}
-
-#[derive(Serialize)]
-struct InfoResponse {
-	system: &'static str,
-	title: &'static str,
-	network_only: bool,
-	show_on_homepage: bool,
-	ci: InfoCI,
-}
 
 async fn root() -> impl IntoResponse {
 	"Hello World"
-}
-
-async fn info() -> impl IntoResponse {
-	let mut headers = HeaderMap::new();
-	headers.insert("X-App-Version", HeaderValue::from_static("1.0"));
-	let json = Json(InfoResponse {
-		system: "lucos_configy",
-		title: "LucOS Configy",
-		ci: InfoCI {
-			circle: "gh/lucas42/lucos_configy",
-		},
-		network_only: true,
-		show_on_homepage: false,
-	});
-	(StatusCode::OK, headers, json)
 }
 
 // Wait for SIGINT or SIGTERM
@@ -77,7 +49,7 @@ async fn main() {
 
 	let app = Router::new()
 		.route("/", get(root))
-		.route("/_info", get(info));
+		.route("/_info", get(crate::info::controller));
 
 	let addr = SocketAddr::from(([0, 0, 0, 0], port));
 	println!("Listening on {}", addr);
