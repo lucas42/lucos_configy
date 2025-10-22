@@ -3,6 +3,7 @@ WORKDIR /usr/src/lucos_configy_api
 
 RUN apk add --no-cache musl-dev pkgconfig
 
+COPY .cargo ./.cargo
 COPY Cargo.toml ./
 COPY src ./src
 RUN cargo build --release

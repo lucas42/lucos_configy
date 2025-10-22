@@ -47,7 +47,7 @@ async fn main() {
 	let arc_data;
 	match crate::data::Data::from_file("config.yaml") {
 		Ok(data) => {
-			println!("Loaded {} systems; {} volumes; {} hosts", data.systemCount(), data.volumeCount(), data.hostCount());
+			println!("Loaded {} systems; {} volumes; {} hosts", data.system_count(), data.volume_count(), data.host_count());
 			arc_data = Arc::new(data);
 		}
 		Err(err) => {

@@ -32,13 +32,13 @@ impl Data {
 		let data: Data = serde_yaml_ng::from_reader(file)?;
 		Ok(data)
 	}
-	pub fn systemCount(&self) -> usize {
+	pub fn system_count(&self) -> usize {
 		self.systems.keys().len()
 	}
-	pub fn volumeCount(&self) -> usize {
+	pub fn volume_count(&self) -> usize {
 		self.volumes.keys().len()
 	}
-	pub fn hostCount(&self) -> usize {
+	pub fn host_count(&self) -> usize {
 		self.hosts.keys().len()
 	}
 }
