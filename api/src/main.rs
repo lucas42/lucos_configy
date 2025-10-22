@@ -3,18 +3,13 @@ mod info;
 mod systems;
 
 use axum::{
-	response::IntoResponse,
+	response::Redirect,
 	routing::get,
 	Router,
 };
 use std::{env, net::SocketAddr};
 use tokio::signal;
 use std::sync::Arc;
-
-
-async fn root() -> impl IntoResponse {
-	"Hello World"
-}
 
 // Wait for SIGINT or SIGTERM
 async fn shutdown_signal() {
@@ -62,7 +57,7 @@ async fn main() {
 		.unwrap_or(3000);
 
 	let app = Router::new()
-		.route("/", get(root))
+		.route("/", get(|| async { Redirect::temporary("/systems") }))
 		.route("/_info", get(crate::info::controller))
 		.route("/systems", get(crate::systems::controller))
 		.with_state(arc_data);
