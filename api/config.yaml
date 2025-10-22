@@ -4,6 +4,15 @@ systems:
         http_port: 8003
         hosts:
             - avalon
+    lucos_dns:
+        domain: dns.l42.eu
+        hosts:
+            - avalon
+    lucos_router:
+        hosts:
+            - avalon
+            - xwing
+
 volumes:
     lucos_authentication_config:
         description: Configuration Data for authentication

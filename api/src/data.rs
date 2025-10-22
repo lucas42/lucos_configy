@@ -7,9 +7,11 @@ use std::path::Path;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct System {
 	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
-	domain: String,
-	http_port: u16, // TCP ports are 16-bit integers
-	hosts: Vec<String>,
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub domain: Option<String>,
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub http_port: Option<u16>, // TCP ports are 16-bit integers
+	pub hosts: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]

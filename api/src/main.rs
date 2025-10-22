@@ -59,7 +59,10 @@ async fn main() {
 	let app = Router::new()
 		.route("/", get(|| async { Redirect::temporary("/systems") }))
 		.route("/_info", get(crate::info::controller))
-		.route("/systems", get(crate::systems::controller))
+		.route("/systems", get(crate::systems::all))
+		.route("/systems/subdomain/{root_domain}", get(crate::systems::subdomain))
+		.route("/systems/http", get(crate::systems::http))
+		.route("/systems/host/{host}", get(crate::systems::host))
 		.with_state(arc_data);
 
 	let addr = SocketAddr::from(([0, 0, 0, 0], port));
