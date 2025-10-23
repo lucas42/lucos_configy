@@ -32,37 +32,56 @@ pub struct Host {
 	pub domain: Option<String>,
 }
 
+// The format the data appears in the YAML file
 #[derive(Deserialize)]
-pub struct Data {
+struct RawData {
 	systems: HashMap<String, System>,
 	volumes: HashMap<String, Volume>,
 	hosts: HashMap<String, Host>,
+}
+
+// The format of data to expose publically
+pub struct Data {
+	systems: Vec<System>,
+	volumes: Vec<Volume>,
+	hosts: Vec<Host>,
 }
 
 
 impl Data {
 	pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Data, Box<dyn std::error::Error>> {
 		let file = std::fs::File::open(path)?;
-		let data: Data = serde_yaml_ng::from_reader(file)?;
+		let mut raw_data: RawData = serde_yaml_ng::from_reader(file)?;
+		let mut data = Data {
+			systems: vec![],
+			volumes: vec![],
+			hosts: vec![],
+		};
+		for (id, system) in raw_data.systems.iter_mut() {
+			system.id = Some(id.to_string());
+			data.systems.push(system.clone());
+		}
+		for (id, volume) in raw_data.volumes.iter_mut() {
+			volume.id = Some(id.to_string());
+			data.volumes.push(volume.clone());
+		}
+		for (id, host) in raw_data.hosts.iter_mut() {
+			host.id = Some(id.to_string());
+			data.hosts.push(host.clone());
+		}
 		Ok(data)
 	}
 	pub fn system_count(&self) -> usize {
-		self.systems.keys().len()
+		self.systems.len()
 	}
 	pub fn volume_count(&self) -> usize {
-		self.volumes.keys().len()
+		self.volumes.len()
 	}
 	pub fn host_count(&self) -> usize {
-		self.hosts.keys().len()
+		self.hosts.len()
 	}
 	pub fn get_systems(&self) -> Vec<System> {
-		let mut systems = vec![];
-		for (id, orig_system) in (&self.systems).into_iter() {
-			let mut system = orig_system.clone();
-			system.id = Some(id.to_string());
-			systems.push(system);
-		}
-		systems
+		self.systems.clone()
 	}
 	pub fn get_systems_filtered<P>(&self, predicate: P) -> Vec<System>
 	where
@@ -74,21 +93,9 @@ impl Data {
 			.collect()
 	}
 	pub fn get_volumes(&self) -> Vec<Volume> {
-		let mut volumes = vec![];
-		for (id, orig_volume) in (&self.volumes).into_iter() {
-			let mut volume = orig_volume.clone();
-			volume.id = Some(id.to_string());
-			volumes.push(volume);
-		}
-		volumes
+		self.volumes.clone()
 	}
 	pub fn get_hosts(&self) -> Vec<Host> {
-		let mut hosts = vec![];
-		for (id, orig_host) in (&self.hosts).into_iter() {
-			let mut host = orig_host.clone();
-			host.id = Some(id.to_string());
-			hosts.push(host);
-		}
-		hosts
+		self.hosts.clone()
 	}
 }
