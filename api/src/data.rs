@@ -25,9 +25,11 @@ pub struct Volume {
 	pub skip_backup: bool,
 }
 
-#[derive(Serialize, Deserialize)]
-struct Host {
-
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Host {
+	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub domain: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -79,5 +81,14 @@ impl Data {
 			volumes.push(volume);
 		}
 		volumes
+	}
+	pub fn get_hosts(&self) -> Vec<Host> {
+		let mut hosts = vec![];
+		for (id, orig_host) in (&self.hosts).into_iter() {
+			let mut host = orig_host.clone();
+			host.id = Some(id.to_string());
+			hosts.push(host);
+		}
+		hosts
 	}
 }

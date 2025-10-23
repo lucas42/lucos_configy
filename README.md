@@ -9,3 +9,4 @@ Configuration Management System for the LucOS ecosystem
 * `/systems/http` - Lists systems which have a `http_port`.
 * `/systems/host/{host}` - Lists systems whose `hosts` list contains the given {host}.
 * `/volumes` - Lists all volumes.
+* `/hosts` - Lists all hosts.
