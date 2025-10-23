@@ -14,9 +14,15 @@ pub struct System {
 	pub hosts: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize)]
-struct Volume {
-
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Volume {
+	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub description: Option<String>,
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub recreate_effort: Option<String>,
+	#[serde(default)]
+	pub skip_backup: bool,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -64,5 +70,14 @@ impl Data {
 			.into_iter()
 			.filter(predicate)
 			.collect()
+	}
+	pub fn get_volumes(&self) -> Vec<Volume> {
+		let mut volumes = vec![];
+		for (id, orig_volume) in (&self.volumes).into_iter() {
+			let mut volume = orig_volume.clone();
+			volume.id = Some(id.to_string());
+			volumes.push(volume);
+		}
+		volumes
 	}
 }

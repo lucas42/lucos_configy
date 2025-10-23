@@ -1,6 +1,7 @@
 mod data;
 mod info;
 mod systems;
+mod volumes;
 
 use axum::{
 	response::Redirect,
@@ -63,6 +64,7 @@ async fn main() {
 		.route("/systems/subdomain/{root_domain}", get(crate::systems::subdomain))
 		.route("/systems/http", get(crate::systems::http))
 		.route("/systems/host/{host}", get(crate::systems::host))
+		.route("/volumes", get(crate::volumes::all))
 		.with_state(arc_data);
 
 	let addr = SocketAddr::from(([0, 0, 0, 0], port));
