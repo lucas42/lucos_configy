@@ -1,12 +1,14 @@
 use std::sync::Arc;
 use axum::{
 	extract::State,
-	response::IntoResponse,
-	Json,
+	response::Response,
+	http::header::HeaderMap,
 };
+use crate::conneg::negotiate_response;
 
 pub async fn all(
 	State(data): State<Arc<crate::data::Data>>,
-) -> impl IntoResponse {
-	Json(data.get_hosts())
+	headers: HeaderMap,
+) -> Response {
+	negotiate_response(&headers, data.get_hosts())
 }

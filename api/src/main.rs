@@ -3,6 +3,7 @@ mod info;
 mod systems;
 mod volumes;
 mod hosts;
+mod conneg;
 
 use axum::{
 	response::Redirect,
