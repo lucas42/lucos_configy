@@ -1,12 +1,14 @@
 use std::sync::Arc;
 use axum::{
 	extract::State,
-	response::IntoResponse,
-	Json,
+};
+use axum_codec::{
+	response::IntoCodecResponse,
+	Codec,
 };
 
 pub async fn all(
 	State(data): State<Arc<crate::data::Data>>,
-) -> impl IntoResponse {
-	Json(data.get_volumes())
+) -> impl IntoCodecResponse {
+	Codec(data.get_volumes())
 }
