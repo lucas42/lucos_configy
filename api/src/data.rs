@@ -7,19 +7,16 @@ use std::path::Path;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct System {
 	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
-	#[serde(skip_serializing_if = "Option::is_none")]
 	pub domain: Option<String>,
-	#[serde(skip_serializing_if = "Option::is_none")]
 	pub http_port: Option<u16>, // TCP ports are 16-bit integers
+	#[serde(skip_serializing)] // CSV gets confused by the variable number of values here; so for now exclude it from serializing
 	pub hosts: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Volume {
 	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
-	#[serde(skip_serializing_if = "Option::is_none")]
 	pub description: Option<String>,
-	#[serde(skip_serializing_if = "Option::is_none")]
 	pub recreate_effort: Option<String>,
 	#[serde(default)]
 	pub skip_backup: bool,
@@ -28,7 +25,6 @@ pub struct Volume {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Host {
 	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
-	#[serde(skip_serializing_if = "Option::is_none")]
 	pub domain: Option<String>,
 }
 
