@@ -28,12 +28,18 @@ pub struct Host {
 	pub domain: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Component {
+	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
+}
+
 // The format the data appears in the YAML file
 #[derive(Deserialize)]
 struct RawData {
 	systems: HashMap<String, System>,
 	volumes: HashMap<String, Volume>,
 	hosts: HashMap<String, Host>,
+	components: HashMap<String, Component>,
 }
 
 // The format of data to expose publically
@@ -41,6 +47,7 @@ pub struct Data {
 	systems: Vec<System>,
 	volumes: Vec<Volume>,
 	hosts: Vec<Host>,
+	components: Vec<Component>,
 }
 
 
@@ -52,6 +59,7 @@ impl Data {
 			systems: vec![],
 			volumes: vec![],
 			hosts: vec![],
+			components: vec![],
 		};
 		for (id, system) in raw_data.systems.iter_mut() {
 			system.id = Some(id.to_string());
@@ -65,6 +73,10 @@ impl Data {
 			host.id = Some(id.to_string());
 			data.hosts.push(host.clone());
 		}
+		for (id, component) in raw_data.components.iter_mut() {
+			component.id = Some(id.to_string());
+			data.components.push(component.clone());
+		}
 		Ok(data)
 	}
 	pub fn system_count(&self) -> usize {
@@ -75,6 +87,9 @@ impl Data {
 	}
 	pub fn host_count(&self) -> usize {
 		self.hosts.len()
+	}
+	pub fn component_count(&self) -> usize {
+		self.components.len()
 	}
 	pub fn get_systems(&self) -> Vec<System> {
 		self.systems.clone()
@@ -93,5 +108,8 @@ impl Data {
 	}
 	pub fn get_hosts(&self) -> Vec<Host> {
 		self.hosts.clone()
+	}
+	pub fn get_components(&self) -> Vec<Component> {
+		self.components.clone()
 	}
 }

@@ -3,6 +3,7 @@ mod info;
 mod systems;
 mod volumes;
 mod hosts;
+mod components;
 mod conneg;
 
 use axum::{
@@ -71,6 +72,8 @@ async fn main() {
 		.route("/volumes{*_subpath}", get(Redirect::temporary("/volumes")))
 		.route("/hosts", get(crate::hosts::all))
 		.route("/hosts{*_subpath}", get(Redirect::temporary("/hosts")))
+		.route("/components", get(crate::components::all))
+		.route("/components{*_subpath}", get(Redirect::temporary("/components")))
 		.with_state(arc_data);
 
 	let addr = SocketAddr::from(([0, 0, 0, 0], port));
