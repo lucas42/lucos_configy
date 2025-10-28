@@ -10,6 +10,8 @@ Configuration Management System for the LucOS ecosystem
 * `/systems/host/{host}` - Lists systems whose `hosts` list contains the given {host}.
 * `/volumes` - Lists all volumes.
 * `/hosts` - Lists all hosts.
+* `/hosts/http` - Lists hosts which serve http.
+* `/components` - Lists all components.
 
 ## Available formats
 Endpoints support the following formats, using standard content negotiation based on the request's `Accept` header:

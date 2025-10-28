@@ -26,6 +26,8 @@ pub struct Volume {
 pub struct Host {
 	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
 	pub domain: Option<String>,
+	#[serde(default)]
+	pub serves_http: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -108,6 +110,15 @@ impl Data {
 	}
 	pub fn get_hosts(&self) -> Vec<Host> {
 		self.hosts.clone()
+	}
+	pub fn get_hosts_filtered<P>(&self, predicate: P) -> Vec<Host>
+	where
+		P: Fn(&Host) -> bool,
+	{
+		self.get_hosts()
+			.into_iter()
+			.filter(predicate)
+			.collect()
 	}
 	pub fn get_components(&self) -> Vec<Component> {
 		self.components.clone()
