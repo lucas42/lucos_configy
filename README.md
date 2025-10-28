@@ -10,3 +10,10 @@ Configuration Management System for the LucOS ecosystem
 * `/systems/host/{host}` - Lists systems whose `hosts` list contains the given {host}.
 * `/volumes` - Lists all volumes.
 * `/hosts` - Lists all hosts.
+
+## Available formats
+Endpoints support the following formats, using standard content negotiation based on the request's `Accept` header:
+* `application/json` - JSON (default).
+* `application/x-yaml` - YAML.
+* `text/csv;header=present` - Comma-separated values, where the first row specifies the variable names.
+* `text/csv;header=absent` - Comma-separated values, where there is no header row.
