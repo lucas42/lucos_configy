@@ -9,7 +9,7 @@ pub struct System {
 	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
 	pub domain: Option<String>,
 	pub http_port: Option<u16>, // TCP ports are 16-bit integers
-	#[serde(skip_serializing)] // CSV gets confused by the variable number of values here; so for now exclude it from serializing
+	#[serde(skip_serializing, default)] // CSV gets confused by the variable number of values here; so for now exclude it from serializing
 	pub hosts: Vec<String>,
 }
 
