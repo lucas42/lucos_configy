@@ -4,10 +4,14 @@ use axum::{
 	http::StatusCode,
 	http::header,
 	http::header::HeaderMap,
+	extract::Query,
 };
 use axum_yaml::Yaml;
 use std::str::FromStr;
+use std::collections::HashSet;
 use mime::Mime;
+use serde_json::{Value, Map};
+use serde::Deserialize;
 
 fn negotiate(headers: &HeaderMap, available_mimes: Vec<Mime>) -> Mime {
 	let accept_string = headers.get(http::header::ACCEPT)
@@ -39,35 +43,142 @@ fn negotiate(headers: &HeaderMap, available_mimes: Vec<Mime>) -> Mime {
 	return mime::APPLICATION_JSON
 }
 
-pub fn negotiate_response<T>(headers: &HeaderMap, data: T) -> Response 
-	where
-		T: std::iter::IntoIterator<Item: serde::Serialize> + serde::Serialize
+#[derive(Deserialize)]
+pub struct Params {
+	pub fields: Option<String>,
+}
+
+fn filter_fields(value: Value, allowed: &Option<HashSet<String>>) -> Value {
+	if let Some(fields) = allowed {
+		match value {
+			Value::Object(map) => {
+				let filtered = map
+					.into_iter()
+					.filter(|(k, _)| fields.contains(k))
+					.map(|(k, v)| (k, filter_fields(v, allowed)))
+					.collect::<Map<_, _>>();
+				Value::Object(filtered)
+			}
+			Value::Array(vec) => Value::Array(
+				vec.into_iter()
+					.map(|v| filter_fields(v, allowed))
+					.collect(),
+			),
+			other => other,
+		}
+	} else {
+		// No filtering requested — return unchanged
+		value
+	}
+}
+
+/// Filter a serde_json::Value object and produce a `Vec<String>` suitable for CSV rows.
+fn filter_fields_csv(value: Value, allowed: &Option<HashSet<String>>, order: &Option<Vec<String>>) -> Vec<String> {
+	match value {
+		Value::Object(map) => {
+			let keys: Vec<String> = if let Some(order) = order {
+				order.clone()
+			} else if let Some(allowed) = allowed {
+				map.keys().filter(|k| allowed.contains(*k)).cloned().collect()
+			} else {
+				map.keys().cloned().collect()
+			};
+
+			keys.iter().map(|k| {
+				map.get(k).map(|v| match v {
+					Value::String(s) => s.clone(),
+					_ => v.to_string(),
+				}).unwrap_or_default()
+			}).collect()
+		}
+		Value::Array(arr) => arr.iter().map(|v| match v {
+			Value::String(s) => s.clone(),
+			_ => v.to_string(),
+		}).collect(),
+		other => vec![match other {
+			Value::String(s) => s,
+			_ => other.to_string(),
+		}],
+	}
+}
+
+pub fn negotiate_response<T>(
+	headers: &HeaderMap,
+	Query(params): Query<Params>,
+	data: T,
+) -> Response
+where
+	T: serde::Serialize + Clone + std::iter::IntoIterator<Item: serde::Serialize>,
 {
+	// Parse "fields" query param into a HashSet
+	let fields: Option<HashSet<String>> = params.fields.as_ref().map(|s| {
+		s.split(',')
+			.map(|s| s.trim().to_string())
+			.filter(|s| !s.is_empty())
+			.collect()
+	});
+
 	let available_mimes = vec![
 		mime::APPLICATION_JSON,
 		Mime::from_str("application/x-yaml").unwrap(),
 		Mime::from_str("text/csv").unwrap(),
 	];
+
 	let mime = negotiate(headers, available_mimes);
+
 	match mime.essence_str() {
-		"application/json" => Json(data).into_response(),
-		"application/x-yaml" => Yaml(data).into_response(),
+		"application/x-yaml" => {
+			let value = serde_json::to_value(data.clone()).unwrap();
+			let filtered = filter_fields(value, &fields);
+			let yaml_value: serde_yaml_ng::Value = serde_yaml_ng::from_str(&serde_json::to_string(&filtered).unwrap()).unwrap();
+			Yaml(yaml_value).into_response()
+		},
 		"text/csv" => {
 			let print_csv_header = mime.get_param("header").map(|n| n.as_str()).unwrap_or("present") != "absent";
-			let mut w = csv::WriterBuilder::new().has_headers(print_csv_header).from_writer(vec![]);
-			for record in data {
-				w.serialize(record).unwrap();
+			let mut w = csv::WriterBuilder::new().has_headers(false).from_writer(vec![]);
+
+			// If a list of fields has been given, use them for field_order
+			let given_field_order: Option<Vec<String>> = fields.as_ref().map(|set| set.iter().cloned().collect());
+			let field_order: Vec<String> = if let Some(ref order) = given_field_order {
+				order.clone()
+			// Otherwise, try to infer fields from the first record
+			} else if let Some(record) = data.clone().into_iter().next() {
+				let value = serde_json::to_value(record).unwrap();
+				if let Value::Object(map) = value {
+					map.keys().cloned().collect()
+				} else {
+					vec!["value".to_string()]
+				}
+			// If there's no records, then the fields names are kinda moot
+			} else {
+				vec![]
+			};
+
+			if print_csv_header {
+				w.write_record(&field_order).unwrap();
 			}
+
+			for record in data {
+				let value = serde_json::to_value(record).unwrap();
+				let row = filter_fields_csv(value, &fields, &Some(field_order.clone()));
+				w.write_record(row).unwrap();
+			}
+
 			let csv_output = String::from_utf8(w.into_inner().unwrap()).unwrap();
-			return Response::builder()
+			Response::builder()
 				.status(StatusCode::OK)
 				.header(header::CONTENT_TYPE, "text/csv")
 				.body(csv_output.into())
 				.unwrap()
 		},
-		_ => Json(data).into_response(),
+		"application/json"|_ => {
+			let value = serde_json::to_value(data.clone()).unwrap();
+			let filtered = filter_fields(value, &fields);
+			Json(filtered).into_response()
+		},
 	}
 }
+
 
 #[cfg(test)]
 mod tests {
