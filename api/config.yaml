@@ -250,12 +250,22 @@ volumes:
 hosts:
     avalon:
         domain: avalon.s.l42.eu
+        ipv4: 178.32.218.44
         serves_http: true
     xwing:
         domain: xwing.s.l42.eu
+        ipv4: 152.37.104.10
+        ipv6: 2a01:4b00:8598:5a00:b078:bfe3:33b0:f6c1
+        ipv4_nat: 152.37.104.10
         serves_http: true
     salvare:
         domain: salvare.s.l42.eu
+        ipv6: 2a01:4b00:8598:5a00:f669:f6da:e174:624b
+        ipv4_nat: 152.37.104.10
+    virgon-express:
+        domain: virgon-express.s.l42.eu
+        ipv6: 2a01:4b00:8598:5a00:9c88:f9a1:bed1:4df
+        ipv4_nat: 152.37.104.10
 
 components:
     lucos_navbar:

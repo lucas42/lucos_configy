@@ -26,6 +26,9 @@ pub struct Volume {
 pub struct Host {
 	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
 	pub domain: Option<String>,
+	pub ipv4: Option<String>, // The primary IPv4 address for this host
+	pub ipv6: Option<String>, // The primary IPv6 address for this host
+	pub ipv4_nat: Option<String>, // An IPv4 address that may forward ports to the host.  For use from legacy networks which don't support IPv6.
 	#[serde(default)]
 	pub serves_http: bool,
 }
