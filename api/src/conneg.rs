@@ -138,7 +138,9 @@ where
 			let mut w = csv::WriterBuilder::new().has_headers(false).from_writer(vec![]);
 
 			// If a list of fields has been given, use them for field_order
-			let given_field_order: Option<Vec<String>> = fields.as_ref().map(|set| set.iter().cloned().collect());
+			let given_field_order: Option<Vec<String>> = params.fields.as_ref().map(|s| {
+				s.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect()
+			});
 			let field_order: Vec<String> = if let Some(ref order) = given_field_order {
 				order.clone()
 			// Otherwise, try to infer fields from the first record
@@ -181,7 +183,7 @@ where
 
 
 #[cfg(test)]
-mod tests {
+mod negotiate_tests {
 	use super::*;
 
 	#[test]
@@ -239,5 +241,147 @@ mod tests {
 		];
 		let negotiated = negotiate(&headers, available);
 		assert_eq!(negotiated.essence_str(), "application/json");
+	}
+}
+
+#[cfg(test)]
+mod negotiate_response_tests {
+	use super::*;
+	use axum::http::HeaderMap;
+	use axum::extract::Query;
+	use serde_json::Value;
+	use axum::body::to_bytes;
+
+	#[derive(Clone, serde::Serialize)]
+	struct TestRecord {
+		a: i32,
+		b: String,
+		c: bool,
+	}
+
+	fn make_data() -> Vec<TestRecord> {
+		vec![
+			TestRecord { a: 1, b: "x".to_string(), c: true },
+			TestRecord { a: 2, b: "y".to_string(), c: false },
+		]
+	}
+
+	async fn body_string(resp: Response) -> String {
+		// set a maximum limit of 1 MB
+		let bytes = to_bytes(resp.into_body(), 1024 * 1024).await.unwrap();
+		String::from_utf8(bytes.to_vec()).unwrap()
+	}
+
+
+	#[tokio::test]
+	async fn json_no_fields() {
+		let mut headers = HeaderMap::new();
+		headers.insert(http::header::ACCEPT, "application/json".parse().unwrap());
+
+		let resp = negotiate_response(&headers, Query(Params { fields: None }), make_data());
+		let body = body_string(resp).await;
+		let parsed: Value = serde_json::from_str(&body).unwrap();
+		assert_eq!(parsed.as_array().unwrap().len(), 2);
+		assert!(parsed.as_array().unwrap()[0].get("a").is_some());
+		assert!(parsed.as_array().unwrap()[0].get("b").is_some());
+		assert!(parsed.as_array().unwrap()[0].get("c").is_some());
+	}
+
+	#[tokio::test]
+	async fn json_with_fields() {
+		let mut headers = HeaderMap::new();
+		headers.insert(http::header::ACCEPT, "application/json".parse().unwrap());
+
+		let resp = negotiate_response(
+			&headers,
+			Query(Params { fields: Some("a,c".to_string()) }),
+			make_data()
+		);
+		let body = body_string(resp).await;
+		let parsed: Value = serde_json::from_str(&body).unwrap();
+		let first = parsed.as_array().unwrap()[0].as_object().unwrap();
+		assert!(first.contains_key("a"));
+		assert!(first.contains_key("c"));
+		assert!(!first.contains_key("b"));
+	}
+
+	#[tokio::test]
+	async fn yaml_no_fields() {
+		let mut headers = HeaderMap::new();
+		headers.insert(http::header::ACCEPT, "application/x-yaml".parse().unwrap());
+
+		let resp = negotiate_response(&headers, Query(Params { fields: None }), make_data());
+		let body = body_string(resp).await;
+		assert!(body.contains("a: 1"));
+		assert!(body.contains("b: x"));
+		assert!(body.contains("c: true"));
+	}
+
+	#[tokio::test]
+	async fn yaml_with_fields() {
+		let mut headers = HeaderMap::new();
+		headers.insert(http::header::ACCEPT, "application/x-yaml".parse().unwrap());
+
+		let resp = negotiate_response(
+			&headers,
+			Query(Params { fields: Some("b,c".to_string()) }),
+			make_data()
+		);
+		let body = body_string(resp).await;
+		assert!(!body.contains("a:"));
+		assert!(body.contains("b: x"));
+		assert!(body.contains("c: true"));
+	}
+
+	#[tokio::test]
+	async fn csv_with_header() {
+		let mut headers = HeaderMap::new();
+		headers.insert(http::header::ACCEPT, "text/csv".parse().unwrap());
+
+		let resp = negotiate_response(
+			&headers,
+			Query(Params { fields: Some("b,a".to_string()) }),
+			make_data()
+		);
+		let body = body_string(resp).await;
+		let mut lines = body.lines();
+		assert_eq!(lines.next().unwrap(), "b,a"); // header
+		assert!(lines.next().unwrap().contains("x,1"));
+		assert!(lines.next().unwrap().contains("y,2"));
+	}
+
+	#[tokio::test]
+	async fn csv_without_header() {
+		let mut headers = HeaderMap::new();
+		headers.insert(http::header::ACCEPT, "text/csv;header=absent".parse().unwrap());
+
+		let resp = negotiate_response(
+			&headers,
+			Query(Params { fields: Some("b,a".to_string()) }),
+			make_data()
+		);
+		let body = body_string(resp).await;
+		let mut lines = body.lines();
+		let first_line = lines.next().unwrap();
+		assert!(!first_line.contains("b,a")); // no header
+		assert!(first_line.contains("x,1") || first_line.contains("y,2")); // first row
+	}
+
+	#[tokio::test]
+	async fn csv_no_fields() {
+		let mut headers = HeaderMap::new();
+		headers.insert(http::header::ACCEPT, "text/csv".parse().unwrap());
+
+		let resp = negotiate_response(&headers, Query(Params { fields: None }), make_data());
+		let body = body_string(resp).await;
+		let mut lines = body.lines();
+		let header = lines.next().unwrap();
+		assert!(header.contains("a"));
+		assert!(header.contains("b"));
+		assert!(header.contains("c"));
+		let first_data = lines.next().unwrap();
+		assert!(first_data.contains("1"));
+		assert!(first_data.contains("x"));
+		assert!(first_data.contains("true"));
 	}
 }
