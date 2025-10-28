@@ -4,7 +4,6 @@ use axum::{
 	extract::State,
 	response::IntoResponse,
 	Json,
-	http::{HeaderMap, HeaderValue, StatusCode},
 };
 use serde::Serialize;
 
@@ -30,12 +29,9 @@ struct InfoResponse {
 	metrics: HashMap<&'static str, Metric>,
 }
 
-
 pub async fn controller(
 	State(data): State<Arc<crate::data::Data>>,
 ) -> impl IntoResponse {
-	let mut headers = HeaderMap::new();
-	headers.insert("X-App-Version", HeaderValue::from_static("1.0"));
 	let mut metrics = HashMap::new();
 	metrics.insert("system-count", Metric {
 		tech_detail: "The total number of systems configured",
@@ -49,7 +45,7 @@ pub async fn controller(
 		tech_detail: "The total number of hosts configured",
 		value: data.host_count() as u8,
 	});
-	let json = Json(InfoResponse {
+	Json(InfoResponse {
 		system: "lucos_configy",
 		title: "LucOS Configy",
 		ci: InfoCI {
@@ -58,6 +54,5 @@ pub async fn controller(
 		network_only: true,
 		show_on_homepage: false,
 		metrics: metrics,
-	});
-	(StatusCode::OK, headers, json)
+	})
 }
