@@ -145,6 +145,10 @@ systems:
         http_port: 8025
         hosts:
             - avalon
+    pici:
+        hosts:
+            - xwing
+            - salvare
     semweb:
         domain: semweb.lukeblaney.co.uk
         http_port: 8029
