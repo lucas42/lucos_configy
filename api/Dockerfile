@@ -1,4 +1,4 @@
-FROM rust:1.91.0-alpine3.22 AS build
+FROM rust:1.91.1-alpine3.22 AS build
 WORKDIR /usr/src/lucos_configy_api
 
 RUN apk add --no-cache musl-dev pkgconfig
