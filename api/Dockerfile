@@ -8,7 +8,7 @@ COPY Cargo.toml ./
 COPY src ./src
 RUN cargo build --release
 
-FROM alpine:3.22
+FROM alpine:3.23
 
 COPY --from=build /usr/src/lucos_configy_api/target/release/lucos_configy_api /usr/local/bin/lucos_configy_api
 COPY config.yaml .
