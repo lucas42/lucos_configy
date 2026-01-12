@@ -23,3 +23,6 @@ Endpoints support the following formats, using standard content negotiation base
 ## Query parameters
 The following GET parameters can be added to the endpoints to control the output:
 * `fields` - A comma-separated list of field names to include in the response (defaults to all fields)
+
+## Running tests
+Run `cargo test` from the `api` directory
