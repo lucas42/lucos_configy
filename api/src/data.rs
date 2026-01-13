@@ -70,18 +70,22 @@ impl Data {
 			system.id = Some(id.to_string());
 			data.systems.push(system.clone());
 		}
+		data.systems.sort_by(|d1, d2| d1.id.cmp(&d2.id));
 		for (id, volume) in raw_data.volumes.iter_mut() {
 			volume.id = Some(id.to_string());
 			data.volumes.push(volume.clone());
 		}
+		data.volumes.sort_by(|d1, d2| d1.id.cmp(&d2.id));
 		for (id, host) in raw_data.hosts.iter_mut() {
 			host.id = Some(id.to_string());
 			data.hosts.push(host.clone());
 		}
+		data.hosts.sort_by(|d1, d2| d1.id.cmp(&d2.id));
 		for (id, component) in raw_data.components.iter_mut() {
 			component.id = Some(id.to_string());
 			data.components.push(component.clone());
 		}
+		data.components.sort_by(|d1, d2| d1.id.cmp(&d2.id));
 		Ok(data)
 	}
 	pub fn system_count(&self) -> usize {
