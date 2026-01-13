@@ -147,7 +147,10 @@ where
 			} else if let Some(record) = data.clone().into_iter().next() {
 				let value = serde_json::to_value(record).unwrap();
 				if let Value::Object(map) = value {
-					map.keys().cloned().collect()
+					map.iter()
+						.filter(|(_, v)| !matches!(v, Value::Array(_)))
+						.map(|(k, _)| k.clone())
+						.collect()
 				} else {
 					vec!["value".to_string()]
 				}
