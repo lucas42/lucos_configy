@@ -3,8 +3,8 @@ services:
     build: api
     container_name: lucos_configy
     ports:
-      - "8034:8034"
+      - $PORT:$PORT
     environment:
-      PORT: 8034
+      - PORT
     image: lucas42/lucos_configy
     restart: always
