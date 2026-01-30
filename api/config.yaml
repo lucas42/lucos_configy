@@ -245,6 +245,9 @@ volumes:
     lucos_media_metadata_api_exports:
         description: Automated exports of media metadata
         recreate_effort: automatic
+    lucos_dns_generatedzones:
+        description: DNS zonefiles which have been automatically generated from lucos_configy data
+        recreate_effort: small
     
 
 hosts:
