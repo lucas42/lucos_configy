@@ -86,3 +86,7 @@ lucos_media_metadata_api_exports:
 lucos_dns_generatedzones:
     description: DNS zonefiles which have been automatically generated from lucos_configy data
     recreate_effort: small
+lucos_comhra_ollama_data:
+    description: Data files for a large language model
+    recreate_effort: automatic
+    skip_backup: true
