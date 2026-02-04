@@ -1,6 +1,9 @@
 services:
   api:
-    build: api
+    build:
+      context: api
+      additional_contexts:
+      - config=config
     container_name: lucos_configy
     ports:
       - $PORT:$PORT

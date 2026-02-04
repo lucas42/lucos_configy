@@ -2,7 +2,9 @@
 Configuration Management System for the LucOS ecosystem
 
 
-## HTTP Endpoints
+## Using the API
+
+### HTTP Endpoints
 
 * `/systems` - Lists all systems.
 * `/systems/subdomain/{root_domain}` - Lists systems whose domain ends with the given {root_domain}.
@@ -13,16 +15,22 @@ Configuration Management System for the LucOS ecosystem
 * `/hosts/http` - Lists hosts which serve http.
 * `/components` - Lists all components.
 
-## Available formats
+### Available formats
 Endpoints support the following formats, using standard content negotiation based on the request's `Accept` header:
 * `application/json` - JSON (default).
 * `application/x-yaml` - YAML.
 * `text/csv;header=present` - Comma-separated values, where the first row specifies the variable names.
 * `text/csv;header=absent` - Comma-separated values, where there is no header row.
 
-## Query parameters
+### Query parameters
 The following GET parameters can be added to the endpoints to control the output:
 * `fields` - A comma-separated list of field names to include in the response (defaults to all fields)
+
+
+## Updating the data
+Edit YAML files in the `config` directory.
+Commit the change to the main branch and push to github.
+The updated API will be automatically deployed.
 
 ## Running tests
 Run `cargo test` from the `api` directory

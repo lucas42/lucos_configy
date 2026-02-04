@@ -11,6 +11,6 @@ RUN cargo build --release
 FROM alpine:3.23
 
 COPY --from=build /usr/src/lucos_configy_api/target/release/lucos_configy_api /usr/local/bin/lucos_configy_api
-COPY config.yaml .
+COPY --from=config config.yaml .
 
 CMD ["lucos_configy_api"]
