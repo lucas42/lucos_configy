@@ -1,0 +1,88 @@
+
+lucos_authentication_config:
+    description: Configuration Data for authentication
+    recreate_effort: small
+lucos_contacts_db_data:
+    description: Personal data about contacts
+    recreate_effort: huge
+lucos_contacts_staticfiles:
+    description: Sharing static assets between docker containers
+    recreate_effort: automatic
+lucos_loganne_state:
+    description: Recent event logs
+    recreate_effort: tolerable
+lucos_media_metadata_api_db:
+    description: Data about media files
+    recreate_effort: huge
+lucos_notes_stateFile:
+    description: Todo list notes
+    recreate_effort: considerable
+lucos_router_generatedconfig:
+    description: Routing configuration
+    recreate_effort: automatic
+lucos_router_letsencrypt:
+    description: TLS certificates
+    recreate_effort: automatic
+lucos_schedule_tracker_db:
+    description: Recent results of scheduled jobs
+    recreate_effort: automatic
+lucos_media_import_media:
+    description: Remote volume on NAS
+    recreate_effort: remote
+    skip_backup: true
+lucos_private_medlib:
+    description: Remote volume on NAS
+    recreate_effort: remote
+    skip_backup: true
+lucos_router_generatedconfig:
+    description: Routing configuration
+    recreate_effort: automatic
+lucos_router_letsencrypt:
+    description: TLS certificates
+    recreate_effort: automatic
+lucos_static_media_public:
+    description: Remote volume on NAS
+    recreate_effort: remote
+    skip_backup: true
+pici_docker:
+    description: Cache of docker layers etc used when building new images
+    recreate_effort: automatic
+    skip_backup: true
+lucos_creds_store:
+    description: Credentials used by lucos services.  Both between services within lucos and to third party services.
+    recreate_effort: considerable
+lucos_media_manager_stateFile:
+    description: The current state of media player, including playlist, volume, is-playing and connected devices.
+    recreate_effort: tolerable
+lucos_locations_store:
+    description: Historic location data
+    recreate_effort: huge
+lucos_locations_config:
+    description: Configuration for OwnTracks Recorder
+    recreate_effort: automatic
+lucos_locations_mosquitto_data:
+    description: Message queue data
+    recreate_effort: automatic
+lucos_locations_mosquitto_log:
+    description: Message queue logs
+    recreate_effort: automatic
+lucos_eolas_db_data:
+    description: Personally curated Knowledge Graph
+    recreate_effort: considerable
+lucos_eolas_staticfiles:
+    description: Sharing static assets between docker containers
+    recreate_effort: automatic
+lucos_arachne_fuseki_data:
+    description: Data from the arachne triple store, gathered from other lucOS systems
+    recreate_effort: automatic
+    skip_backup: true
+lucos_arachne_typesense_data:
+    description: Data from the arachne search index, gathered from other lucOS systems
+    recreate_effort: automatic
+    skip_backup: true
+lucos_media_metadata_api_exports:
+    description: Automated exports of media metadata
+    recreate_effort: automatic
+lucos_dns_generatedzones:
+    description: DNS zonefiles which have been automatically generated from lucos_configy data
+    recreate_effort: small

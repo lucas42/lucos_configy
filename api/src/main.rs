@@ -45,7 +45,7 @@ async fn shutdown_signal() {
 #[tokio::main]
 async fn main() {
 	let arc_data;
-	match crate::data::Data::from_file("config.yaml") {
+	match crate::data::Data::from_dir("config") {
 		Ok(data) => {
 			println!("Loaded {} systems; {} volumes; {} hosts", data.system_count(), data.volume_count(), data.host_count());
 			arc_data = Arc::new(data);

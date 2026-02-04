@@ -1,0 +1,165 @@
+lucos_arachne:
+    domain: arachne.l42.eu
+    http_port: 8033
+    hosts:
+        - avalon
+lucos_authentication:
+    domain: auth.l42.eu
+    http_port: 8006
+    hosts:
+        - avalon
+lucos_backups:
+    domain: backups.l42.eu
+    http_port: 8027
+    hosts:
+        - avalon
+lucos_comhra:
+    domain: comhra.l42.eu
+    http_port: 8035
+    hosts:
+        - avalon
+lucos_configy:
+    domain: configy.l42.eu
+    http_port: 8034
+    hosts:
+        - avalon
+lucos_contacts:
+    domain: contacts.l42.eu
+    http_port: 8013
+    hosts:
+        - avalon
+lucos_contacts_fb_import:
+lucos_contacts_googlesync_import:
+    hosts:
+        - avalon
+lucos_contacts_gphotos_import:
+lucos_creds:
+    domain: creds.l42.eu
+    http_port: 8031
+    hosts:
+        - avalon
+lucos_deploy_orb:
+lucos_dns:
+    domain: dns.l42.eu
+    hosts:
+        - avalon
+lucos_eolas:
+    domain: eolas.l42.eu
+    http_port: 8032
+    hosts:
+        - avalon
+lucos_locations:
+    domain: locations.l42.eu
+    http_port: 8028
+    hosts:
+        - avalon
+lucos_loganne:
+    domain: loganne.l42.eu
+    http_port: 8019
+    hosts:
+        - avalon
+lucos_mail:
+    domain: mail.l42.eu
+    http_port: 8022
+    hosts:
+        - avalon
+lucos_media_import:
+    hosts:
+        - xwing
+lucos_media_linuxplayer:
+    hosts:
+        - xwing
+        - salvare
+lucos_media_manager:
+    domain: ceol.l42.eu
+    http_port: 8001
+    hosts:
+        - avalon
+lucos_media_metadata_api:
+    domain: media-api.l42.eu
+    http_port: 3002
+    hosts:
+        - avalon
+lucos_media_metadata_manager:
+    domain: media-metadata.l42.eu
+    http_port: 8020
+    hosts:
+        - avalon
+lucos_media_seinn:
+    domain: seinn.l42.eu
+    http_port: 3001
+    hosts:
+        - avalon
+lucos_media_weightings:
+    domain: media-weighting.l42.eu
+    http_port: 8023
+    hosts:
+        - avalon
+lucos_monitoring:
+    domain: monitoring.l42.eu
+    http_port: 8015
+    hosts:
+        - avalon
+lucos_notes:
+    domain: notes.l42.eu
+    http_port: 8004
+    hosts:
+        - avalon
+lucos_private:
+    domain: private.l42.eu
+    http_port: 8016
+    hosts:
+        - xwing
+lucos_repos:
+    domain: repos.l42.eu
+    http_port: 8030
+    hosts:
+        - avalon
+lucos_root:
+    domain: l42.eu
+    http_port: 8003
+    hosts:
+        - avalon
+lucos_router:
+    hosts:
+        - avalon
+        - xwing
+lucos_scenes:
+    domain: scenes.l42.eu
+    http_port: 8026
+    hosts:
+        - avalon
+lucos_schedule_tracker:
+    domain: schedule-tracker.l42.eu
+    http_port: 8024
+    hosts:
+        - avalon
+lucos_static_media:
+    domain: staticmedia.l42.eu
+    http_port: 8017
+    hosts:
+        - xwing
+lucos_time:
+    domain: am.l42.eu
+    http_port: 8008
+    hosts:
+        - avalon
+lukeblaney_co_uk:
+    domain: lukeblaney.co.uk
+    http_port: 8025
+    hosts:
+        - avalon
+pici:
+    hosts:
+        - xwing
+        - salvare
+semweb:
+    domain: semweb.lukeblaney.co.uk
+    http_port: 8029
+    hosts:
+        - avalon
+tfluke:
+    domain: app.tfluke.uk
+    http_port: 3000
+    hosts:
+        - avalon

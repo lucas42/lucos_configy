@@ -38,15 +38,6 @@ pub struct Component {
 	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
 }
 
-// The format the data appears in the YAML file
-#[derive(Deserialize)]
-struct RawData {
-	systems: HashMap<String, System>,
-	volumes: HashMap<String, Volume>,
-	hosts: HashMap<String, Host>,
-	components: HashMap<String, Component>,
-}
-
 // The format of data to expose publically
 pub struct Data {
 	systems: Vec<System>,
@@ -57,35 +48,45 @@ pub struct Data {
 
 
 impl Data {
-	pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Data, Box<dyn std::error::Error>> {
-		let file = std::fs::File::open(path)?;
-		let mut raw_data: RawData = serde_yaml_ng::from_reader(file)?;
+	pub fn from_dir<P: AsRef<Path>>(path: P) -> Result<Data, Box<dyn std::error::Error>> {
 		let mut data = Data {
 			systems: vec![],
 			volumes: vec![],
 			hosts: vec![],
 			components: vec![],
 		};
-		for (id, system) in raw_data.systems.iter_mut() {
+		let systems_file = std::fs::File::open(path.as_ref().join("systems.yaml"))?;
+		let mut raw_systems: HashMap<String, System> = serde_yaml_ng::from_reader(systems_file)?;
+		for (id, system) in raw_systems.iter_mut() {
 			system.id = Some(id.to_string());
 			data.systems.push(system.clone());
 		}
 		data.systems.sort_by(|d1, d2| d1.id.cmp(&d2.id));
-		for (id, volume) in raw_data.volumes.iter_mut() {
+
+		let volumes_file = std::fs::File::open(path.as_ref().join("volumes.yaml"))?;
+		let mut raw_volumes: HashMap<String, Volume> = serde_yaml_ng::from_reader(volumes_file)?;
+		for (id, volume) in raw_volumes.iter_mut() {
 			volume.id = Some(id.to_string());
 			data.volumes.push(volume.clone());
 		}
 		data.volumes.sort_by(|d1, d2| d1.id.cmp(&d2.id));
-		for (id, host) in raw_data.hosts.iter_mut() {
+
+		let hosts_file = std::fs::File::open(path.as_ref().join("hosts.yaml"))?;
+		let mut raw_hosts: HashMap<String, Host> = serde_yaml_ng::from_reader(hosts_file)?;
+		for (id, host) in raw_hosts.iter_mut() {
 			host.id = Some(id.to_string());
 			data.hosts.push(host.clone());
 		}
 		data.hosts.sort_by(|d1, d2| d1.id.cmp(&d2.id));
-		for (id, component) in raw_data.components.iter_mut() {
+
+		let components_file = std::fs::File::open(path.as_ref().join("components.yaml"))?;
+		let mut raw_components: HashMap<String, Component> = serde_yaml_ng::from_reader(components_file)?;
+		for (id, component) in raw_components.iter_mut() {
 			component.id = Some(id.to_string());
 			data.components.push(component.clone());
 		}
 		data.components.sort_by(|d1, d2| d1.id.cmp(&d2.id));
+
 		Ok(data)
 	}
 	pub fn system_count(&self) -> usize {
