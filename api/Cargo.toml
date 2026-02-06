@@ -25,3 +25,8 @@ http = "1"
 # (Optional) structured logging/tracing support (handy in async servers)
 tracing = "0.1"
 tracing-subscriber = "0.3"
+
+[dev-dependencies]
+tempfile = "3"
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"

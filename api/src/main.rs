@@ -1,16 +1,5 @@
-mod data;
-mod info;
-mod systems;
-mod volumes;
-mod hosts;
-mod components;
-mod conneg;
-
-use axum::{
-	response::Redirect,
-	routing::get,
-	Router,
-};
+use lucos_configy_api::routing::app;
+use lucos_configy_api::data::Data;
 use std::{env, net::SocketAddr};
 use tokio::signal;
 use std::sync::Arc;
@@ -45,7 +34,7 @@ async fn shutdown_signal() {
 #[tokio::main]
 async fn main() {
 	let arc_data;
-	match crate::data::Data::from_dir("config") {
+	match Data::from_dir("config") {
 		Ok(data) => {
 			println!("Loaded {} systems; {} volumes; {} hosts", data.system_count(), data.volume_count(), data.host_count());
 			arc_data = Arc::new(data);
@@ -60,22 +49,7 @@ async fn main() {
 		.and_then(|p| p.parse().ok())
 		.unwrap_or(3000);
 
-	let app = Router::new()
-		.route("/", get(Redirect::temporary("/systems")))
-		.route("/_info", get(crate::info::controller))
-		.route("/systems", get(crate::systems::all))
-		.route("/systems/subdomain/{root_domain}", get(crate::systems::subdomain))
-		.route("/systems/http", get(crate::systems::http))
-		.route("/systems/host/{host}", get(crate::systems::host))
-		.route("/systems{*_subpath}", get(Redirect::temporary("/systems")))
-		.route("/volumes", get(crate::volumes::all))
-		.route("/volumes{*_subpath}", get(Redirect::temporary("/volumes")))
-		.route("/hosts", get(crate::hosts::all))
-		.route("/hosts/http", get(crate::hosts::http))
-		.route("/hosts{*_subpath}", get(Redirect::temporary("/hosts")))
-		.route("/components", get(crate::components::all))
-		.route("/components{*_subpath}", get(Redirect::temporary("/components")))
-		.with_state(arc_data);
+	let app = app(arc_data);
 
 	let addr = SocketAddr::from(([0, 0, 0, 0], port));
 	println!("Listening on {}", addr);

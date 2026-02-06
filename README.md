@@ -33,4 +33,27 @@ Commit the change to the main branch and push to github.
 The updated API will be automatically deployed.
 
 ## Running tests
-Run `cargo test` from the `api` directory
+Tests are located in the `api` directory.
+
+### API Logic Tests
+These tests validate the application logic using mock data. They do not depend on the actual contents of the `config` directory.
+Run them using:
+```bash
+cd api
+cargo test --test api_logic
+```
+
+### Config Validation
+This validates that the YAML files in the `config` directory are valid and match the application's data models.
+Run them using:
+```bash
+cd api
+cargo test --test validation
+```
+
+### All Tests
+To run both sets of tests (and all other unit tests):
+```bash
+cd api
+cargo test
+```
