@@ -90,3 +90,15 @@ lucos_comhra_ollama_data:
     description: Data files for a large language model
     recreate_effort: automatic
     skip_backup: true
+lucos_photos_photos:
+    description: Original photos and derivatives uploaded from Android
+    recreate_effort: huge
+lucos_photos_postgres_data:
+    description: Relational metadata including manually curated face and person associations
+    recreate_effort: considerable
+lucos_photos_qdrant_data:
+    description: Face embeddings for similarity search, regenerable from photos
+    recreate_effort: automatic
+lucos_photos_redis_data:
+    description: Internal job queue for photo processing tasks
+    recreate_effort: automatic
