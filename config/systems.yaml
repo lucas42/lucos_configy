@@ -105,6 +105,11 @@ lucos_notes:
     http_port: 8004
     hosts:
         - avalon
+lucos_photos:
+    domain: photos.l42.eu
+    http_port: 8036
+    hosts:
+        - avalon
 lucos_private:
     domain: private.l42.eu
     http_port: 8016
