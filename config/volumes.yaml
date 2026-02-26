@@ -102,3 +102,6 @@ lucos_photos_qdrant_data:
 lucos_photos_redis_data:
     description: Internal job queue for photo processing tasks
     recreate_effort: automatic
+lucos_photos_uploads:
+    description: Staging area for uploaded photos awaiting worker processing
+    recreate_effort: tolerable
