@@ -96,9 +96,6 @@ lucos_photos_photos:
 lucos_photos_postgres_data:
     description: Relational metadata including manually curated face and person associations
     recreate_effort: considerable
-lucos_photos_qdrant_data:
-    description: Face embeddings for similarity search, regenerable from photos
-    recreate_effort: automatic
 lucos_photos_redis_data:
     description: Internal job queue for photo processing tasks
     recreate_effort: automatic
