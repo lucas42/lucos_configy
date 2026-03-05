@@ -102,3 +102,6 @@ lucos_photos_redis_data:
 lucos_photos_uploads:
     description: Staging area for uploaded photos awaiting worker processing
     recreate_effort: tolerable
+lucos_repos_data:
+    description: SQLite database for lucos_repos convention auditor
+    recreate_effort: automatic
