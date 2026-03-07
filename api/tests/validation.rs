@@ -25,6 +25,7 @@ fn validate_config_files() {
 			println!("  Volumes: {}", data.volume_count());
 			println!("  Hosts: {}", data.host_count());
 			println!("  Components: {}", data.component_count());
+			println!("  Scripts: {}", data.script_count());
 			
 			// Basic sanity checks
 			assert!(data.system_count() > 0, "No systems found in config");

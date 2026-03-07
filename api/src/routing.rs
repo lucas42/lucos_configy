@@ -21,5 +21,7 @@ pub fn app(arc_data: Arc<crate::data::Data>) -> Router {
 		.route("/hosts{*_subpath}", get(Redirect::temporary("/hosts")))
 		.route("/components", get(crate::components::all))
 		.route("/components{*_subpath}", get(Redirect::temporary("/components")))
+		.route("/scripts", get(crate::scripts::all))
+		.route("/scripts{*_subpath}", get(Redirect::temporary("/scripts")))
 		.with_state(arc_data)
 }

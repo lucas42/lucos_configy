@@ -42,12 +42,20 @@ pub struct Component {
 	pub unsupervised_agent_code: bool,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Script {
+	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
+	#[serde(rename = "unsupervisedAgentCode", default)]
+	pub unsupervised_agent_code: bool,
+}
+
 // The format of data to expose publically
 pub struct Data {
 	systems: Vec<System>,
 	volumes: Vec<Volume>,
 	hosts: Vec<Host>,
 	components: Vec<Component>,
+	scripts: Vec<Script>,
 }
 
 
@@ -58,6 +66,7 @@ impl Data {
 			volumes: vec![],
 			hosts: vec![],
 			components: vec![],
+			scripts: vec![],
 		};
 		let systems_file = std::fs::File::open(path.as_ref().join("systems.yaml"))?;
 		let mut raw_systems: HashMap<String, System> = serde_yaml_ng::from_reader(systems_file)?;
@@ -91,6 +100,14 @@ impl Data {
 		}
 		data.components.sort_by(|d1, d2| d1.id.cmp(&d2.id));
 
+		let scripts_file = std::fs::File::open(path.as_ref().join("scripts.yaml"))?;
+		let mut raw_scripts: HashMap<String, Script> = serde_yaml_ng::from_reader(scripts_file)?;
+		for (id, script) in raw_scripts.iter_mut() {
+			script.id = Some(id.to_string());
+			data.scripts.push(script.clone());
+		}
+		data.scripts.sort_by(|d1, d2| d1.id.cmp(&d2.id));
+
 		Ok(data)
 	}
 	pub fn system_count(&self) -> usize {
@@ -104,6 +121,9 @@ impl Data {
 	}
 	pub fn component_count(&self) -> usize {
 		self.components.len()
+	}
+	pub fn script_count(&self) -> usize {
+		self.scripts.len()
 	}
 	pub fn get_systems(&self) -> Vec<System> {
 		self.systems.clone()
@@ -134,5 +154,8 @@ impl Data {
 	}
 	pub fn get_components(&self) -> Vec<Component> {
 		self.components.clone()
+	}
+	pub fn get_scripts(&self) -> Vec<Script> {
+		self.scripts.clone()
 	}
 }

@@ -46,8 +46,12 @@ pub async fn controller(
 		value: data.host_count() as u8,
 	});
 	metrics.insert("component-count", Metric {
-		tech_detail: "The total number of hosts configured",
+		tech_detail: "The total number of components configured",
 		value: data.component_count() as u8,
+	});
+	metrics.insert("script-count", Metric {
+		tech_detail: "The total number of local scripts configured",
+		value: data.script_count() as u8,
 	});
 	Json(InfoResponse {
 		system: "lucos_configy",
