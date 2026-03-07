@@ -110,6 +110,9 @@ lucos_photos:
     http_port: 8036
     hosts:
         - avalon
+    unsupervisedAgentCode: true
+lucos_photos_android:
+    unsupervisedAgentCode: true
 lucos_private:
     domain: private.l42.eu
     http_port: 8016
@@ -120,6 +123,7 @@ lucos_repos:
     http_port: 8030
     hosts:
         - avalon
+    unsupervisedAgentCode: true
 lucos_root:
     domain: l42.eu
     http_port: 8003

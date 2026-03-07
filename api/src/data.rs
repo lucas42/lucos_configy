@@ -11,6 +11,8 @@ pub struct System {
 	pub http_port: Option<u16>, // TCP ports are 16-bit integers
 	#[serde(default)]
 	pub hosts: Vec<String>,
+	#[serde(rename = "unsupervisedAgentCode", default)]
+	pub unsupervised_agent_code: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -36,6 +38,8 @@ pub struct Host {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Component {
 	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
+	#[serde(rename = "unsupervisedAgentCode", default)]
+	pub unsupervised_agent_code: bool,
 }
 
 // The format of data to expose publically

@@ -21,6 +21,7 @@ system1:
   domain: s1.example.com
   http_port: 80
   hosts: [host1]
+  unsupervisedAgentCode: true
 system2:
   domain: s2.test.com
   http_port: 8080
@@ -54,7 +55,8 @@ host2:
 	let components_path = dir.path().join("components.yaml");
 	let mut components_file = File::create(components_path).unwrap();
 	writeln!(components_file, "
-comp1: {{}}
+comp1:
+  unsupervisedAgentCode: true
 comp2: {{}}
 ").unwrap();
 
@@ -257,4 +259,50 @@ async fn test_query_params_fields() {
 	assert!(first.get("id").is_some());
 	assert!(first.get("domain").is_some());
 	assert!(first.get("http_port").is_none());
+}
+
+#[tokio::test]
+async fn test_systems_unsupervised_agent_code_set() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/systems").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+
+	// system1 has unsupervisedAgentCode: true in the mock YAML
+	let system1 = body.as_array().unwrap().iter().find(|s| s["id"] == "system1").unwrap();
+	assert_eq!(system1["unsupervisedAgentCode"], true);
+
+	// system2 does not set the field, so it should default to false
+	let system2 = body.as_array().unwrap().iter().find(|s| s["id"] == "system2").unwrap();
+	assert_eq!(system2["unsupervisedAgentCode"], false);
+}
+
+#[tokio::test]
+async fn test_components_unsupervised_agent_code_set() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/components").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+
+	// comp1 has unsupervisedAgentCode: true in the mock YAML
+	let comp1 = body.as_array().unwrap().iter().find(|c| c["id"] == "comp1").unwrap();
+	assert_eq!(comp1["unsupervisedAgentCode"], true);
+
+	// comp2 does not set the field, so it should default to false
+	let comp2 = body.as_array().unwrap().iter().find(|c| c["id"] == "comp2").unwrap();
+	assert_eq!(comp2["unsupervisedAgentCode"], false);
 }
