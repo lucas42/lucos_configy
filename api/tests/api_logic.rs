@@ -60,6 +60,14 @@ comp1:
 comp2: {{}}
 ").unwrap();
 
+	let scripts_path = dir.path().join("scripts.yaml");
+	let mut scripts_file = File::create(scripts_path).unwrap();
+	writeln!(scripts_file, "
+script1:
+  unsupervisedAgentCode: true
+script2: {{}}
+").unwrap();
+
 	let data = Data::from_dir(dir.path()).unwrap();
 	Arc::new(data)
 }
@@ -282,6 +290,45 @@ async fn test_systems_unsupervised_agent_code_set() {
 	// system2 does not set the field, so it should default to false
 	let system2 = body.as_array().unwrap().iter().find(|s| s["id"] == "system2").unwrap();
 	assert_eq!(system2["unsupervisedAgentCode"], false);
+}
+
+#[tokio::test]
+async fn test_scripts_all() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/scripts").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+	assert_eq!(body.as_array().unwrap().len(), 2);
+}
+
+#[tokio::test]
+async fn test_scripts_unsupervised_agent_code_set() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/scripts").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+
+	// script1 has unsupervisedAgentCode: true in the mock YAML
+	let script1 = body.as_array().unwrap().iter().find(|s| s["id"] == "script1").unwrap();
+	assert_eq!(script1["unsupervisedAgentCode"], true);
+
+	// script2 does not set the field, so it should default to false
+	let script2 = body.as_array().unwrap().iter().find(|s| s["id"] == "script2").unwrap();
+	assert_eq!(script2["unsupervisedAgentCode"], false);
 }
 
 #[tokio::test]
