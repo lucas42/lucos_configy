@@ -28,11 +28,9 @@ lucos_contacts:
     http_port: 8013
     hosts:
         - avalon
-lucos_contacts_fb_import:
 lucos_contacts_googlesync_import:
     hosts:
         - avalon
-lucos_contacts_gphotos_import:
 lucos_creds:
     domain: creds.l42.eu
     http_port: 8031
