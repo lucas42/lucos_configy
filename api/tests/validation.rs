@@ -29,6 +29,18 @@ fn validate_config_files() {
 			// Basic sanity checks
 			assert!(data.system_count() > 0, "No systems found in config");
 			assert!(data.host_count() > 0, "No hosts found in config");
+
+			// A system with a domain must have at most one host, to prevent silent DNS misconfiguration
+			for system in data.get_systems() {
+				if system.domain.is_some() {
+					assert!(
+						system.hosts.len() <= 1,
+						"System with domain must have at most one host, but has {}: {:?}",
+						system.hosts.len(),
+						system.domain
+					);
+				}
+			}
 		}
 		Err(e) => {
 			panic!("Failed to validate config: {:?}", e);
