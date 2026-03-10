@@ -11,7 +11,7 @@ services:
       - PORT
     image: lucas42/lucos_configy
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:${PORT}/_info"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:${PORT}/_info"]
       interval: 10s
       timeout: 5s
       retries: 3
