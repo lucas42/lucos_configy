@@ -10,4 +10,10 @@ services:
     environment:
       - PORT
     image: lucas42/lucos_configy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:${PORT}/_info"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     restart: always
