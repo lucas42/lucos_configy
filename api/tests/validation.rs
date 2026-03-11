@@ -1,5 +1,6 @@
 use lucos_configy_api::data::Data;
 use std::path::Path;
+use serde_yaml_ng::Value;
 
 #[test]
 fn validate_config_files() {
@@ -46,5 +47,42 @@ fn validate_config_files() {
 		Err(e) => {
 			panic!("Failed to validate config: {:?}", e);
 		}
+	}
+}
+
+#[test]
+fn config_files_are_sorted_alphabetically() {
+	let config_path = Path::new("..").join("config");
+	let final_path = if config_path.exists() {
+		config_path
+	} else {
+		Path::new("config").to_path_buf()
+	};
+
+	let config_files = ["systems.yaml", "volumes.yaml", "hosts.yaml", "components.yaml", "scripts.yaml"];
+
+	for filename in &config_files {
+		let file_path = final_path.join(filename);
+		let file = std::fs::File::open(&file_path)
+			.unwrap_or_else(|e| panic!("Failed to open {:?}: {}", file_path, e));
+
+		let value: Value = serde_yaml_ng::from_reader(file)
+			.unwrap_or_else(|e| panic!("Failed to parse {:?}: {}", file_path, e));
+
+		let mapping = value.as_mapping()
+			.unwrap_or_else(|| panic!("{} is not a YAML mapping", filename));
+
+		let keys: Vec<&str> = mapping.keys()
+			.map(|k| k.as_str().unwrap_or_else(|| panic!("Non-string key in {}", filename)))
+			.collect();
+
+		let mut sorted_keys = keys.clone();
+		sorted_keys.sort();
+
+		assert_eq!(
+			keys, sorted_keys,
+			"{} keys are not in alphabetical order. Got: {:?}",
+			filename, keys
+		);
 	}
 }
