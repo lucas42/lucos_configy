@@ -3,6 +3,7 @@ lucos_arachne:
     http_port: 8033
     hosts:
         - avalon
+    unsupervisedAgentCode: true
 lucos_authentication:
     domain: auth.l42.eu
     http_port: 8006
