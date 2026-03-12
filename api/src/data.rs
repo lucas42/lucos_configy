@@ -22,6 +22,8 @@ pub struct Volume {
 	pub recreate_effort: Option<String>,
 	#[serde(default)]
 	pub skip_backup: bool,
+	#[serde(default)]
+	pub skip_backup_on_hosts: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
