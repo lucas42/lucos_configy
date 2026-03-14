@@ -7,7 +7,10 @@ lucos_agent:
     unsupervisedAgentCode: true
 lucos_agent_coding_sandbox:
     unsupervisedAgentCode: true
+lucos_antigravity_config:
+    unsupervisedAgentCode: true
 lucos_claude_config:
     unsupervisedAgentCode: true
 lucos_contacts_fb_import:
 lucos_contacts_gphotos_import:
+lucos_mockauthentication:
