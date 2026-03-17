@@ -97,7 +97,3 @@ lucos_static_media_public:
     description: Remote volume on NAS
     recreate_effort: remote
     skip_backup: true
-pici_docker:
-    description: Cache of docker layers etc used when building new images
-    recreate_effort: automatic
-    skip_backup: true
