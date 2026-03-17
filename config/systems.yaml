@@ -160,7 +160,6 @@ lukeblaney_co_uk:
 pici:
     hosts:
         - xwing
-        - salvare
 semweb:
     domain: semweb.lukeblaney.co.uk
     http_port: 8029
