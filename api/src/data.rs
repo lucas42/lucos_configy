@@ -1,5 +1,6 @@
 use serde_yaml_ng;
 use serde::{Serialize, Deserialize};
+use serde_json::Value;
 use std::collections::HashMap;
 use std::vec::Vec;
 use std::path::Path;
@@ -159,5 +160,54 @@ impl Data {
 	}
 	pub fn get_scripts(&self) -> Vec<Script> {
 		self.scripts.clone()
+	}
+
+	/// Look up a repository by id across systems, components, and scripts.
+	/// Returns the item serialised as a JSON Value with an additional `type` field,
+	/// or `None` if no match is found.
+	pub fn get_repository(&self, id: &str) -> Option<Value> {
+		if let Some(system) = self.systems.iter().find(|s| s.id.as_deref() == Some(id)) {
+			let mut value = serde_json::to_value(system).unwrap();
+			if let Value::Object(ref mut map) = value {
+				map.insert("type".to_string(), Value::String("system".to_string()));
+			}
+			return Some(value);
+		}
+		if let Some(component) = self.components.iter().find(|c| c.id.as_deref() == Some(id)) {
+			let mut value = serde_json::to_value(component).unwrap();
+			if let Value::Object(ref mut map) = value {
+				map.insert("type".to_string(), Value::String("component".to_string()));
+			}
+			return Some(value);
+		}
+		if let Some(script) = self.scripts.iter().find(|s| s.id.as_deref() == Some(id)) {
+			let mut value = serde_json::to_value(script).unwrap();
+			if let Value::Object(ref mut map) = value {
+				map.insert("type".to_string(), Value::String("script".to_string()));
+			}
+			return Some(value);
+		}
+		None
+	}
+
+	/// Returns all repository ids (across systems, components, and scripts) as a Vec of (id, type) pairs.
+	pub fn get_all_repository_ids(&self) -> Vec<(String, &'static str)> {
+		let mut ids = Vec::new();
+		for s in &self.systems {
+			if let Some(id) = &s.id {
+				ids.push((id.clone(), "system"));
+			}
+		}
+		for c in &self.components {
+			if let Some(id) = &c.id {
+				ids.push((id.clone(), "component"));
+			}
+		}
+		for s in &self.scripts {
+			if let Some(id) = &s.id {
+				ids.push((id.clone(), "script"));
+			}
+		}
+		ids
 	}
 }

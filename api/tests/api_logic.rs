@@ -332,6 +332,124 @@ async fn test_scripts_unsupervised_agent_code_set() {
 }
 
 #[tokio::test]
+async fn test_repositories_get_system() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/repositories/system1").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+	assert_eq!(body["id"], "system1");
+	assert_eq!(body["type"], "system");
+	assert_eq!(body["domain"], "s1.example.com");
+	assert!(body.get("unsupervisedAgentCode").is_some());
+	// Single object, not an array
+	assert!(body.as_object().is_some());
+}
+
+#[tokio::test]
+async fn test_repositories_get_component() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/repositories/comp1").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+	assert_eq!(body["id"], "comp1");
+	assert_eq!(body["type"], "component");
+	assert_eq!(body["unsupervisedAgentCode"], true);
+}
+
+#[tokio::test]
+async fn test_repositories_get_script() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/repositories/script1").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+	assert_eq!(body["id"], "script1");
+	assert_eq!(body["type"], "script");
+	assert_eq!(body["unsupervisedAgentCode"], true);
+}
+
+#[tokio::test]
+async fn test_repositories_get_not_found() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/repositories/nonexistent").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn test_repositories_get_yaml() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/repositories/system1")
+				.header("accept", "application/x-yaml")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	assert_eq!(response.headers().get("content-type").unwrap(), "application/yaml");
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body_str = std::str::from_utf8(&body).unwrap();
+	assert!(body_str.contains("id: system1"));
+	assert!(body_str.contains("type: system"));
+}
+
+#[tokio::test]
+async fn test_repositories_get_fields_filter() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/repositories/system1?fields=id,type")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+	assert_eq!(body["id"], "system1");
+	assert_eq!(body["type"], "system");
+	assert!(body.get("domain").is_none());
+	assert!(body.get("http_port").is_none());
+}
+
+#[tokio::test]
 async fn test_components_unsupervised_agent_code_set() {
 	let data = create_mock_data().await;
 	let app = app(data);

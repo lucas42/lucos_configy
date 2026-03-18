@@ -102,6 +102,48 @@ fn filter_fields_csv(value: Value, allowed: &Option<HashSet<String>>, order: &Op
 	}
 }
 
+/// Respond with a single item (not wrapped in an array), or 404 if None.
+/// Supports the same content negotiation and `fields` filtering as `negotiate_response`.
+pub fn negotiate_response_single(
+	headers: &HeaderMap,
+	Query(params): Query<Params>,
+	item: Option<serde_json::Value>,
+) -> Response {
+	let Some(value) = item else {
+		return Response::builder()
+			.status(StatusCode::NOT_FOUND)
+			.header(header::CONTENT_TYPE, "text/plain")
+			.body("Not found".into())
+			.unwrap();
+	};
+
+	let fields: Option<HashSet<String>> = params.fields.as_ref().map(|s| {
+		s.split(',')
+			.map(|s| s.trim().to_string())
+			.filter(|s| !s.is_empty())
+			.collect()
+	});
+
+	let available_mimes = vec![
+		mime::APPLICATION_JSON,
+		Mime::from_str("application/x-yaml").unwrap(),
+	];
+
+	let mime = negotiate(headers, available_mimes);
+
+	match mime.essence_str() {
+		"application/x-yaml" => {
+			let filtered = filter_fields(value, &fields);
+			let yaml_value: serde_yaml_ng::Value = serde_yaml_ng::from_str(&serde_json::to_string(&filtered).unwrap()).unwrap();
+			Yaml(yaml_value).into_response()
+		},
+		"application/json" | _ => {
+			let filtered = filter_fields(value, &fields);
+			Json(filtered).into_response()
+		},
+	}
+}
+
 pub fn negotiate_response<T>(
 	headers: &HeaderMap,
 	Query(params): Query<Params>,

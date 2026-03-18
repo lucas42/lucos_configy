@@ -51,6 +51,30 @@ fn validate_config_files() {
 }
 
 #[test]
+fn repository_ids_are_unique_across_types() {
+	let config_path = Path::new("..").join("config");
+	let final_path = if config_path.exists() {
+		config_path
+	} else {
+		Path::new("config").to_path_buf()
+	};
+
+	let data = Data::from_dir(&final_path).expect("Failed to load config");
+	let ids = data.get_all_repository_ids();
+
+	let mut seen: std::collections::HashMap<String, &str> = std::collections::HashMap::new();
+	for (id, repo_type) in &ids {
+		if let Some(existing_type) = seen.get(id.as_str()) {
+			panic!(
+				"Repository id {:?} appears in both {:?} and {:?}",
+				id, existing_type, repo_type
+			);
+		}
+		seen.insert(id.clone(), repo_type);
+	}
+}
+
+#[test]
 fn config_files_are_sorted_alphabetically() {
 	let config_path = Path::new("..").join("config");
 	let final_path = if config_path.exists() {

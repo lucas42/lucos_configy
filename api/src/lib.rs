@@ -5,5 +5,6 @@ pub mod volumes;
 pub mod hosts;
 pub mod components;
 pub mod scripts;
+pub mod repositories;
 pub mod conneg;
 pub mod routing;
