@@ -14,6 +14,8 @@ Configuration Management System for the LucOS ecosystem
 * `/hosts` - Lists all hosts.
 * `/hosts/http` - Lists hosts which serve http.
 * `/components` - Lists all components.
+* `/scripts` - Lists all scripts.
+* `/repositories/{id}` - Returns a single repository (system, component, or script) by its id. Searches across all three types and includes a `type` field (`"system"`, `"component"`, or `"script"`) in the response. Returns 404 if no repository with the given id is found. Note: this endpoint does not support CSV format (returns JSON or YAML only).
 
 ### Available formats
 Endpoints support the following formats, using standard content negotiation based on the request's `Accept` header:
