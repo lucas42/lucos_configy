@@ -14,6 +14,11 @@ lucos_backups:
     http_port: 8027
     hosts:
         - avalon
+lucos_blog:
+    domain: blog.lukeblaney.co.uk
+    http_port: 8037
+    hosts:
+        - avalon
 lucos_comhra:
     domain: comhra.l42.eu
     http_port: 8035
