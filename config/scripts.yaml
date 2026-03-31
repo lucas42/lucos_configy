@@ -14,7 +14,5 @@ lucos_claude_config:
     unsupervisedAgentCode: true
 lucos_contacts_fb_import:
 lucos_contacts_gphotos_import:
-# lucos_docker_health will become a system once built; script for now to avoid inapplicable conventions
-lucos_docker_health:
 lucos_mockauthentication:
 lukeblaney_cv:

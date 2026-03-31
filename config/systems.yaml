@@ -42,6 +42,11 @@ lucos_dns:
     domain: dns.l42.eu
     hosts:
         - avalon
+lucos_docker_health:
+    hosts:
+        - avalon
+        - salvare
+        - xwing
 lucos_eolas:
     domain: eolas.l42.eu
     http_port: 8032
