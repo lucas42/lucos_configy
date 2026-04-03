@@ -1,6 +1,7 @@
 
 .dotfiles:
 .github-test:
+    unsupervisedAgentCode: true
 # lucos is primarily documentation rather than a script, but doesn't warrant its own type
 lucos:
     unsupervisedAgentCode: true
