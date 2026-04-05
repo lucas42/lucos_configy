@@ -43,6 +43,7 @@ lucos_dns:
     hosts:
         - avalon
 lucos_docker_health:
+    unsupervisedAgentCode: true
     hosts:
         - avalon
         - salvare
