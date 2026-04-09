@@ -15,5 +15,4 @@ lucos_claude_config:
     unsupervisedAgentCode: true
 lucos_contacts_fb_import:
 lucos_contacts_gphotos_import:
-lucos_mockauthentication:
 lukeblaney_cv:
