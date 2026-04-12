@@ -34,6 +34,7 @@ pub struct Host {
 	pub ipv4: Option<String>, // The primary IPv4 address for this host
 	pub ipv6: Option<String>, // The primary IPv6 address for this host
 	pub ipv4_nat: Option<String>, // An IPv4 address that may forward ports to the host.  For use from legacy networks which don't support IPv6.
+	pub ssh_gateway: Option<String>, // SSH gateway to use when connecting to this host
 	#[serde(default)]
 	pub serves_http: bool,
 }
