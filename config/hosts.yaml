@@ -7,6 +7,7 @@ salvare:
     domain: salvare.s.l42.eu
     ipv6: 2a01:4b00:8598:5a00:f669:f6da:e174:624b
     ipv4_nat: 152.37.104.10
+    ssh_gateway: xwing
 virgon-express:
     domain: virgon-express.s.l42.eu
     ipv6: 2a01:4b00:8598:5a00:9c88:f9a1:bed1:4df
