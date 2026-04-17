@@ -9,7 +9,7 @@ services:
       - $PORT:$PORT
     environment:
       - PORT
-    image: lucas42/lucos_configy
+    image: lucas42/lucos_configy:${VERSION:-latest}
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:${PORT}/_info"]
       interval: 10s
