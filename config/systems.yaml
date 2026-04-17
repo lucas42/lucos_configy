@@ -49,6 +49,10 @@ lucos_docker_health:
         - avalon
         - salvare
         - xwing
+lucos_docker_mirror:
+    unsupervisedAgentCode: true
+    hosts:
+        - avalon
 lucos_eolas:
     domain: eolas.l42.eu
     http_port: 8032
