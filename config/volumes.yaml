@@ -26,6 +26,10 @@ lucos_creds_store:
 lucos_dns_generatedzones:
     description: DNS zonefiles which have been automatically generated from lucos_configy data
     recreate_effort: small
+lucos_docker_mirror_cache:
+    description: Cached Docker image layers pulled through from Docker Hub
+    recreate_effort: automatic
+    skip_backup: true
 lucos_eolas_db_data:
     description: Personally curated Knowledge Graph
     recreate_effort: considerable
