@@ -50,7 +50,8 @@ lucos_docker_health:
         - salvare
         - xwing
 lucos_docker_mirror:
-    domain: mirror.l42.eu
+    domain: docker.l42.eu
+    http_port: 8038
     unsupervisedAgentCode: true
     hosts:
         - avalon
