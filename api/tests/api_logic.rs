@@ -542,6 +542,8 @@ async fn test_all_turtle_contains_ontology_classes() {
 	assert!(body.contains("configy:Script"));
 	assert!(body.contains("owl:Class"));
 	assert!(body.contains("eolas:hasCategory eolas:Technological"));
+	assert!(body.contains("eolas:Technological"));
+	assert!(body.contains("skos:prefLabel \"Technological\""));
 }
 
 #[tokio::test]
@@ -563,11 +565,11 @@ async fn test_all_turtle_contains_systems() {
 	let body = response.into_body().collect().await.unwrap().to_bytes();
 	let body = std::str::from_utf8(&body).unwrap();
 
-	assert!(body.contains("<https://configy.l42.eu/systems/system1>"));
+	assert!(body.contains("/systems#system1>"));
 	assert!(body.contains("a configy:System"));
 	assert!(body.contains("configy:domain \"s1.example.com\""));
 	assert!(body.contains("configy:httpPort 80"));
-	assert!(body.contains("configy:hostedOn <https://configy.l42.eu/hosts/host1>"));
+	assert!(body.contains("/hosts#host1>"));
 	assert!(body.contains("configy:unsupervisedAgentCode true"));
 }
 
@@ -590,7 +592,7 @@ async fn test_all_turtle_contains_hosts() {
 	let body = response.into_body().collect().await.unwrap().to_bytes();
 	let body = std::str::from_utf8(&body).unwrap();
 
-	assert!(body.contains("<https://configy.l42.eu/hosts/host1>"));
+	assert!(body.contains("/hosts#host1>"));
 	assert!(body.contains("a configy:Host"));
 	assert!(body.contains("configy:ipv4 \"1.1.1.1\""));
 	assert!(body.contains("configy:servesHttp true"));
@@ -615,7 +617,7 @@ async fn test_all_turtle_contains_volumes() {
 	let body = response.into_body().collect().await.unwrap().to_bytes();
 	let body = std::str::from_utf8(&body).unwrap();
 
-	assert!(body.contains("<https://configy.l42.eu/volumes/vol1>"));
+	assert!(body.contains("/volumes#vol1>"));
 	assert!(body.contains("a configy:Volume"));
 	assert!(body.contains("configy:recreateEffort \"Low\""));
 	assert!(body.contains("configy:skipBackup true"));

@@ -10,8 +10,6 @@ use mime::Mime;
 use crate::conneg::negotiate;
 use crate::data::{Data, System, Host, Volume, Component, Script};
 
-const CONFIGY_BASE: &str = "https://configy.l42.eu";
-
 fn escape_turtle_literal(s: &str) -> String {
 	s.replace('\\', "\\\\").replace('"', "\\\"").replace('\n', "\\n").replace('\r', "\\r")
 }
@@ -20,6 +18,10 @@ fn turtle_ontology() -> String {
 	let mut out = String::new();
 
 	out.push_str("# Ontology\n");
+
+	// eolas:Technological must be defined here so the RDF is self-contained
+	// (arachne ingestor requires type metadata inline — see lucos_arachne#371)
+	out.push_str("\neolas:Technological\n    skos:prefLabel \"Technological\" .\n");
 
 	for (class, label) in &[
 		("System", "System"),
@@ -56,14 +58,14 @@ fn turtle_ontology() -> String {
 	out
 }
 
-fn turtle_systems(systems: &[System]) -> String {
+fn turtle_systems(systems: &[System], base: &str) -> String {
 	let mut out = String::new();
 	for system in systems {
 		let id = match &system.id {
 			Some(id) => id,
 			None => continue,
 		};
-		out.push_str(&format!("\n<{CONFIGY_BASE}/systems/{id}>\n    a configy:System ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
+		out.push_str(&format!("\n<{base}/systems#{id}>\n    a configy:System ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
 		if let Some(domain) = &system.domain {
 			out.push_str(&format!(" ;\n    configy:domain \"{}\"", escape_turtle_literal(domain)));
 		}
@@ -71,7 +73,7 @@ fn turtle_systems(systems: &[System]) -> String {
 			out.push_str(&format!(" ;\n    configy:httpPort {port}"));
 		}
 		for host in &system.hosts {
-			out.push_str(&format!(" ;\n    configy:hostedOn <{CONFIGY_BASE}/hosts/{host}>"));
+			out.push_str(&format!(" ;\n    configy:hostedOn <{base}/hosts#{host}>"));
 		}
 		if system.unsupervised_agent_code {
 			out.push_str(" ;\n    configy:unsupervisedAgentCode true");
@@ -81,14 +83,14 @@ fn turtle_systems(systems: &[System]) -> String {
 	out
 }
 
-fn turtle_hosts(hosts: &[Host]) -> String {
+fn turtle_hosts(hosts: &[Host], base: &str) -> String {
 	let mut out = String::new();
 	for host in hosts {
 		let id = match &host.id {
 			Some(id) => id,
 			None => continue,
 		};
-		out.push_str(&format!("\n<{CONFIGY_BASE}/hosts/{id}>\n    a configy:Host ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
+		out.push_str(&format!("\n<{base}/hosts#{id}>\n    a configy:Host ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
 		if let Some(domain) = &host.domain {
 			out.push_str(&format!(" ;\n    configy:domain \"{}\"", escape_turtle_literal(domain)));
 		}
@@ -109,14 +111,14 @@ fn turtle_hosts(hosts: &[Host]) -> String {
 	out
 }
 
-fn turtle_volumes(volumes: &[Volume]) -> String {
+fn turtle_volumes(volumes: &[Volume], base: &str) -> String {
 	let mut out = String::new();
 	for volume in volumes {
 		let id = match &volume.id {
 			Some(id) => id,
 			None => continue,
 		};
-		out.push_str(&format!("\n<{CONFIGY_BASE}/volumes/{id}>\n    a configy:Volume ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
+		out.push_str(&format!("\n<{base}/volumes#{id}>\n    a configy:Volume ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
 		if let Some(desc) = &volume.description {
 			out.push_str(&format!(" ;\n    dc:description \"{}\"", escape_turtle_literal(desc)));
 		}
@@ -127,21 +129,21 @@ fn turtle_volumes(volumes: &[Volume]) -> String {
 			out.push_str(" ;\n    configy:skipBackup true");
 		}
 		for host in &volume.skip_backup_on_hosts {
-			out.push_str(&format!(" ;\n    configy:skipBackupOnHost <{CONFIGY_BASE}/hosts/{host}>"));
+			out.push_str(&format!(" ;\n    configy:skipBackupOnHost <{base}/hosts#{host}>"));
 		}
 		out.push_str(" .\n");
 	}
 	out
 }
 
-fn turtle_components(components: &[Component]) -> String {
+fn turtle_components(components: &[Component], base: &str) -> String {
 	let mut out = String::new();
 	for component in components {
 		let id = match &component.id {
 			Some(id) => id,
 			None => continue,
 		};
-		out.push_str(&format!("\n<{CONFIGY_BASE}/components/{id}>\n    a configy:Component ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
+		out.push_str(&format!("\n<{base}/components#{id}>\n    a configy:Component ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
 		if component.unsupervised_agent_code {
 			out.push_str(" ;\n    configy:unsupervisedAgentCode true");
 		}
@@ -150,14 +152,14 @@ fn turtle_components(components: &[Component]) -> String {
 	out
 }
 
-fn turtle_scripts(scripts: &[Script]) -> String {
+fn turtle_scripts(scripts: &[Script], base: &str) -> String {
 	let mut out = String::new();
 	for script in scripts {
 		let id = match &script.id {
 			Some(id) => id,
 			None => continue,
 		};
-		out.push_str(&format!("\n<{CONFIGY_BASE}/scripts/{id}>\n    a configy:Script ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
+		out.push_str(&format!("\n<{base}/scripts#{id}>\n    a configy:Script ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
 		if script.unsupervised_agent_code {
 			out.push_str(" ;\n    configy:unsupervisedAgentCode true");
 		}
@@ -166,7 +168,7 @@ fn turtle_scripts(scripts: &[Script]) -> String {
 	out
 }
 
-pub fn to_turtle(data: &Data) -> String {
+pub fn to_turtle(data: &Data, base: &str) -> String {
 	let mut out = String::new();
 	out.push_str("@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n");
 	out.push_str("@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n");
@@ -175,25 +177,25 @@ pub fn to_turtle(data: &Data) -> String {
 	out.push_str("@prefix skos: <http://www.w3.org/2004/02/skos/core#> .\n");
 	out.push_str("@prefix dc: <http://purl.org/dc/elements/1.1/> .\n");
 	out.push_str("@prefix eolas: <https://eolas.l42.eu/ontology#> .\n");
-	out.push_str("@prefix configy: <https://configy.l42.eu/ontology#> .\n");
+	out.push_str(&format!("@prefix configy: <{base}/ontology#> .\n"));
 
 	out.push_str("\n");
 	out.push_str(&turtle_ontology());
 
 	out.push_str("\n# Systems\n");
-	out.push_str(&turtle_systems(&data.get_systems()));
+	out.push_str(&turtle_systems(&data.get_systems(), base));
 
 	out.push_str("\n# Hosts\n");
-	out.push_str(&turtle_hosts(&data.get_hosts()));
+	out.push_str(&turtle_hosts(&data.get_hosts(), base));
 
 	out.push_str("\n# Volumes\n");
-	out.push_str(&turtle_volumes(&data.get_volumes()));
+	out.push_str(&turtle_volumes(&data.get_volumes(), base));
 
 	out.push_str("\n# Components\n");
-	out.push_str(&turtle_components(&data.get_components()));
+	out.push_str(&turtle_components(&data.get_components(), base));
 
 	out.push_str("\n# Scripts\n");
-	out.push_str(&turtle_scripts(&data.get_scripts()));
+	out.push_str(&turtle_scripts(&data.get_scripts(), base));
 
 	out
 }
@@ -209,7 +211,8 @@ pub async fn all(
 	let mime = negotiate(&headers, available_mimes);
 
 	if mime.essence_str() == "text/turtle" {
-		let turtle = to_turtle(&data);
+		let base = std::env::var("APP_ORIGIN").unwrap_or_else(|_| "https://configy.l42.eu".to_string());
+		let turtle = to_turtle(&data, &base);
 		return Response::builder()
 			.status(StatusCode::OK)
 			.header(header::CONTENT_TYPE, "text/turtle; charset=utf-8")
