@@ -63,7 +63,7 @@ fn turtle_systems(systems: &[System]) -> String {
 			Some(id) => id,
 			None => continue,
 		};
-		out.push_str(&format!("\n<{CONFIGY_BASE}/systems/{id}>\n    a configy:System ;\n    skos:prefLabel \"{id}\""));
+		out.push_str(&format!("\n<{CONFIGY_BASE}/systems/{id}>\n    a configy:System ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
 		if let Some(domain) = &system.domain {
 			out.push_str(&format!(" ;\n    configy:domain \"{}\"", escape_turtle_literal(domain)));
 		}
@@ -88,7 +88,7 @@ fn turtle_hosts(hosts: &[Host]) -> String {
 			Some(id) => id,
 			None => continue,
 		};
-		out.push_str(&format!("\n<{CONFIGY_BASE}/hosts/{id}>\n    a configy:Host ;\n    skos:prefLabel \"{id}\""));
+		out.push_str(&format!("\n<{CONFIGY_BASE}/hosts/{id}>\n    a configy:Host ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
 		if let Some(domain) = &host.domain {
 			out.push_str(&format!(" ;\n    configy:domain \"{}\"", escape_turtle_literal(domain)));
 		}
@@ -116,7 +116,7 @@ fn turtle_volumes(volumes: &[Volume]) -> String {
 			Some(id) => id,
 			None => continue,
 		};
-		out.push_str(&format!("\n<{CONFIGY_BASE}/volumes/{id}>\n    a configy:Volume ;\n    skos:prefLabel \"{id}\""));
+		out.push_str(&format!("\n<{CONFIGY_BASE}/volumes/{id}>\n    a configy:Volume ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
 		if let Some(desc) = &volume.description {
 			out.push_str(&format!(" ;\n    dc:description \"{}\"", escape_turtle_literal(desc)));
 		}
@@ -141,7 +141,7 @@ fn turtle_components(components: &[Component]) -> String {
 			Some(id) => id,
 			None => continue,
 		};
-		out.push_str(&format!("\n<{CONFIGY_BASE}/components/{id}>\n    a configy:Component ;\n    skos:prefLabel \"{id}\""));
+		out.push_str(&format!("\n<{CONFIGY_BASE}/components/{id}>\n    a configy:Component ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
 		if component.unsupervised_agent_code {
 			out.push_str(" ;\n    configy:unsupervisedAgentCode true");
 		}
@@ -157,7 +157,7 @@ fn turtle_scripts(scripts: &[Script]) -> String {
 			Some(id) => id,
 			None => continue,
 		};
-		out.push_str(&format!("\n<{CONFIGY_BASE}/scripts/{id}>\n    a configy:Script ;\n    skos:prefLabel \"{id}\""));
+		out.push_str(&format!("\n<{CONFIGY_BASE}/scripts/{id}>\n    a configy:Script ;\n    skos:prefLabel \"{}\"", escape_turtle_literal(id)));
 		if script.unsupervised_agent_code {
 			out.push_str(" ;\n    configy:unsupervisedAgentCode true");
 		}
