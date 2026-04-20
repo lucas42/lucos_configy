@@ -13,7 +13,7 @@ use mime::Mime;
 use serde_json::{Value, Map};
 use serde::Deserialize;
 
-fn negotiate(headers: &HeaderMap, available_mimes: Vec<Mime>) -> Mime {
+pub fn negotiate(headers: &HeaderMap, available_mimes: Vec<Mime>) -> Mime {
 	let accept_string = headers.get(http::header::ACCEPT)
 		.and_then(|h| h.to_str().ok())
 		.unwrap_or("");

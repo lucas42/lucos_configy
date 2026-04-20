@@ -7,6 +7,7 @@ use std::sync::Arc;
 
 pub fn app(arc_data: Arc<crate::data::Data>) -> Router {
 	Router::new()
+		.route("/all", get(crate::all::all))
 		.route("/", get(Redirect::temporary("/systems")))
 		.route("/_info", get(crate::info::controller))
 		.route("/systems", get(crate::systems::all))

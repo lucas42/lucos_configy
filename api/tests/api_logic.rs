@@ -471,3 +471,181 @@ async fn test_components_unsupervised_agent_code_set() {
 	let comp2 = body.as_array().unwrap().iter().find(|c| c["id"] == "comp2").unwrap();
 	assert_eq!(comp2["unsupervisedAgentCode"], false);
 }
+
+#[tokio::test]
+async fn test_all_turtle_content_type() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/all")
+				.header("Accept", "text/turtle")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	assert!(response.headers().get("content-type").unwrap().to_str().unwrap().contains("text/turtle"));
+}
+
+#[tokio::test]
+async fn test_all_turtle_contains_prefixes() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/all")
+				.header("Accept", "text/turtle")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body = std::str::from_utf8(&body).unwrap();
+
+	assert!(body.contains("@prefix configy: <https://configy.l42.eu/ontology#>"));
+	assert!(body.contains("@prefix skos:"));
+	assert!(body.contains("@prefix owl:"));
+}
+
+#[tokio::test]
+async fn test_all_turtle_contains_ontology_classes() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/all")
+				.header("Accept", "text/turtle")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body = std::str::from_utf8(&body).unwrap();
+
+	assert!(body.contains("configy:System"));
+	assert!(body.contains("configy:Host"));
+	assert!(body.contains("configy:Volume"));
+	assert!(body.contains("configy:Component"));
+	assert!(body.contains("configy:Script"));
+	assert!(body.contains("owl:Class"));
+	assert!(body.contains("eolas:hasCategory eolas:Technological"));
+	assert!(body.contains("eolas:Technological"));
+	assert!(body.contains("skos:prefLabel \"Technological\""));
+}
+
+#[tokio::test]
+async fn test_all_turtle_contains_systems() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/all")
+				.header("Accept", "text/turtle")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body = std::str::from_utf8(&body).unwrap();
+
+	assert!(body.contains("/systems#system1>"));
+	assert!(body.contains("a configy:System"));
+	assert!(body.contains("configy:domain \"s1.example.com\""));
+	assert!(body.contains("configy:httpPort 80"));
+	assert!(body.contains("/hosts#host1>"));
+	assert!(body.contains("configy:unsupervisedAgentCode true"));
+}
+
+#[tokio::test]
+async fn test_all_turtle_contains_hosts() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/all")
+				.header("Accept", "text/turtle")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body = std::str::from_utf8(&body).unwrap();
+
+	assert!(body.contains("/hosts#host1>"));
+	assert!(body.contains("a configy:Host"));
+	assert!(body.contains("configy:ipv4 \"1.1.1.1\""));
+	assert!(body.contains("configy:servesHttp true"));
+}
+
+#[tokio::test]
+async fn test_all_turtle_contains_volumes() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/all")
+				.header("Accept", "text/turtle")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body = std::str::from_utf8(&body).unwrap();
+
+	assert!(body.contains("/volumes#vol1>"));
+	assert!(body.contains("a configy:Volume"));
+	assert!(body.contains("configy:recreateEffort \"Low\""));
+	assert!(body.contains("configy:skipBackup true"));
+}
+
+#[tokio::test]
+async fn test_all_json_fallback() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/all")
+				.header("Accept", "application/json")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	assert_eq!(response.headers().get("content-type").unwrap(), "application/json");
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+	assert!(body.get("systems").is_some());
+	assert!(body.get("hosts").is_some());
+	assert!(body.get("volumes").is_some());
+	assert!(body.get("components").is_some());
+	assert!(body.get("scripts").is_some());
+}
