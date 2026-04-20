@@ -8,3 +8,4 @@ pub mod scripts;
 pub mod repositories;
 pub mod conneg;
 pub mod routing;
+pub mod all;

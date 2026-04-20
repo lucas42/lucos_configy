@@ -7,7 +7,7 @@ use std::path::Path;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct System {
-	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
+	pub id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
 	pub domain: Option<String>,
 	pub http_port: Option<u16>, // TCP ports are 16-bit integers
 	#[serde(default)]
@@ -18,7 +18,7 @@ pub struct System {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Volume {
-	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
+	pub id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
 	pub description: Option<String>,
 	pub recreate_effort: Option<String>,
 	#[serde(default)]
@@ -29,7 +29,7 @@ pub struct Volume {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Host {
-	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
+	pub id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
 	pub domain: Option<String>,
 	pub ipv4: Option<String>, // The primary IPv4 address for this host
 	pub ipv6: Option<String>, // The primary IPv6 address for this host
@@ -41,14 +41,14 @@ pub struct Host {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Component {
-	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
+	pub id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
 	#[serde(rename = "unsupervisedAgentCode", default)]
 	pub unsupervised_agent_code: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Script {
-	id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
+	pub id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
 	#[serde(rename = "unsupervisedAgentCode", default)]
 	pub unsupervised_agent_code: bool,
 }
