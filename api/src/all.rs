@@ -176,7 +176,7 @@ pub fn to_turtle(data: &Data, base: &str) -> String {
 	out.push_str("@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n");
 	out.push_str("@prefix skos: <http://www.w3.org/2004/02/skos/core#> .\n");
 	out.push_str("@prefix dc: <http://purl.org/dc/elements/1.1/> .\n");
-	out.push_str("@prefix eolas: <https://eolas.l42.eu/ontology#> .\n");
+	out.push_str("@prefix eolas: <https://eolas.l42.eu/ontology/> .\n");
 	out.push_str(&format!("@prefix configy: <{base}/ontology#> .\n"));
 
 	out.push_str("\n");
