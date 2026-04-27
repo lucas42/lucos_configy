@@ -55,6 +55,9 @@ lucos_media_import_media:
     description: Remote volume on NAS
     recreate_effort: remote
     skip_backup: true
+lucos_media_import_state:
+    description: Checkpoint file for the resumable weekly import scan
+    recreate_effort: tolerable
 lucos_media_manager_stateFile:
     description: The current state of media player, including playlist, volume, is-playing and connected devices.
     recreate_effort: tolerable
