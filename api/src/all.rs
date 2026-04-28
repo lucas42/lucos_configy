@@ -46,6 +46,10 @@ fn turtle_ontology() -> String {
 		("ipv6", "IPv6 Address", "configy:Host", "xsd:string"),
 		("ipv4Nat", "IPv4 NAT Address", "configy:Host", "xsd:string"),
 		("servesHttp", "Serves HTTP", "configy:Host", "xsd:boolean"),
+		("sshGateway", "SSH Gateway", "configy:Host", "configy:Host"),
+		("backupRoot", "Backup Root", "configy:Host", "xsd:string"),
+		("isStorageOnly", "Is Storage Only", "configy:Host", "xsd:boolean"),
+		("shellFlavour", "Shell Flavour", "configy:Host", "xsd:string"),
 		("recreateEffort", "Recreate Effort", "configy:Volume", "xsd:string"),
 		("skipBackup", "Skip Backup", "configy:Volume", "xsd:boolean"),
 		("skipBackupOnHost", "Skip Backup On Host", "configy:Volume", "configy:Host"),
@@ -105,6 +109,18 @@ fn turtle_hosts(hosts: &[Host], base: &str) -> String {
 		}
 		if host.serves_http {
 			out.push_str(" ;\n    configy:servesHttp true");
+		}
+		if let Some(gateway) = &host.ssh_gateway {
+			out.push_str(&format!(" ;\n    configy:sshGateway <{base}/hosts#{gateway}>"));
+		}
+		if let Some(backup_root) = &host.backup_root {
+			out.push_str(&format!(" ;\n    configy:backupRoot \"{}\"", escape_turtle_literal(backup_root)));
+		}
+		if host.is_storage_only {
+			out.push_str(" ;\n    configy:isStorageOnly true");
+		}
+		if let Some(shell_flavour) = &host.shell_flavour {
+			out.push_str(&format!(" ;\n    configy:shellFlavour \"{}\"", escape_turtle_literal(shell_flavour)));
 		}
 		out.push_str(" .\n");
 	}
