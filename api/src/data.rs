@@ -36,6 +36,11 @@ pub struct Host {
 	pub ipv4_nat: Option<String>, // An IPv4 address that may forward ports to the host.  For use from legacy networks which don't support IPv6.
 	#[serde(default)]
 	pub serves_http: bool,
+	pub ssh_gateway: Option<String>,   // hostname of a host to use as ProxyJump when connecting
+	pub backup_root: Option<String>,   // backup storage root path; lucos_backups defaults to /srv/backups/
+	#[serde(default)]
+	pub is_storage_only: bool,         // skip this host from the backup source loop in lucos_backups
+	pub shell_flavour: Option<String>, // "gnu" (default) or "busybox"
 }
 
 #[derive(Serialize, Deserialize, Clone)]
