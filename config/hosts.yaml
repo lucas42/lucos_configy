@@ -3,7 +3,7 @@ aurora:
     domain: aurora.local
     ipv4: 192.168.8.143
     ssh_gateway: xwing
-    backup_root: /share/backups
+    backup_root: /share/backups/
     is_storage_only: true
     shell_flavour: busybox
     serves_http: false
