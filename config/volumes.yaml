@@ -75,6 +75,7 @@ lucos_photos_photos:
     recreate_effort: huge
     skip_backup_on_hosts:
         - salvare
+        - xwing
 lucos_photos_postgres_data:
     description: Relational metadata including manually curated face and person associations
     recreate_effort: considerable
