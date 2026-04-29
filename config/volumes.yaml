@@ -30,9 +30,6 @@ lucos_docker_mirror_cache:
 lucos_eolas_db_data:
     description: Personally curated Knowledge Graph
     recreate_effort: considerable
-lucos_eolas_staticfiles:
-    description: Sharing static assets between docker containers
-    recreate_effort: automatic
 lucos_locations_config:
     description: Configuration for OwnTracks Recorder
     recreate_effort: automatic
