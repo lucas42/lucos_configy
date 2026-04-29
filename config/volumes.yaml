@@ -17,9 +17,6 @@ lucos_comhra_ollama_data:
 lucos_contacts_db_data:
     description: Personal data about contacts
     recreate_effort: huge
-lucos_contacts_staticfiles:
-    description: Sharing static assets between docker containers
-    recreate_effort: automatic
 lucos_creds_store:
     description: Credentials used by lucos services.  Both between services within lucos and to third party services.
     recreate_effort: considerable
