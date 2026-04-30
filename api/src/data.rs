@@ -5,6 +5,8 @@ use std::collections::HashMap;
 use std::vec::Vec;
 use std::path::Path;
 
+fn default_true() -> bool { true }
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct System {
 	pub id: Option<String>, // This is optional because the raw yaml specifies it as than key, rather than as an attribute
@@ -41,6 +43,8 @@ pub struct Host {
 	#[serde(default)]
 	pub is_storage_only: bool,         // skip this host from the backup source loop in lucos_backups
 	pub shell_flavour: Option<String>, // "gnu" (default) or "busybox"
+	#[serde(default = "default_true")]
+	pub can_reach_external_services: bool, // whether this host can wget/curl from public HTTPS (e.g. GitHub codeload); defaults true
 }
 
 #[derive(Serialize, Deserialize, Clone)]
