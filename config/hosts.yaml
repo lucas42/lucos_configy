@@ -7,6 +7,7 @@ aurora:
     is_storage_only: true
     shell_flavour: busybox
     serves_http: false
+    can_reach_external_services: false
 avalon:
     domain: avalon.s.l42.eu
     ipv4: 178.32.218.44
