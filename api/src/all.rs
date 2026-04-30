@@ -50,6 +50,7 @@ fn turtle_ontology() -> String {
 		("backupRoot", "Backup Root", "configy:Host", "xsd:string"),
 		("isStorageOnly", "Is Storage Only", "configy:Host", "xsd:boolean"),
 		("shellFlavour", "Shell Flavour", "configy:Host", "xsd:string"),
+		("canReachExternalServices", "Can Reach External Services", "configy:Host", "xsd:boolean"),
 		("recreateEffort", "Recreate Effort", "configy:Volume", "xsd:string"),
 		("skipBackup", "Skip Backup", "configy:Volume", "xsd:boolean"),
 		("skipBackupOnHost", "Skip Backup On Host", "configy:Volume", "configy:Host"),
@@ -121,6 +122,9 @@ fn turtle_hosts(hosts: &[Host], base: &str) -> String {
 		}
 		if let Some(shell_flavour) = &host.shell_flavour {
 			out.push_str(&format!(" ;\n    configy:shellFlavour \"{}\"", escape_turtle_literal(shell_flavour)));
+		}
+		if !host.can_reach_external_services {
+			out.push_str(" ;\n    configy:canReachExternalServices false");
 		}
 		out.push_str(" .\n");
 	}

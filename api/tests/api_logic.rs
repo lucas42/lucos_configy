@@ -50,6 +50,7 @@ host2:
   domain: h2.example.com
   ipv4: 1.1.1.2
   serves_http: false
+  can_reach_external_services: false
 ").unwrap();
 
 	let components_path = dir.path().join("components.yaml");
@@ -187,6 +188,31 @@ async fn test_hosts_http() {
 	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
 	assert_eq!(body.as_array().unwrap().len(), 1);
 	assert_eq!(body[0]["id"], "host1");
+}
+
+#[tokio::test]
+async fn test_hosts_can_reach_external_services_default() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/hosts").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+
+	// host1 does not set can_reach_external_services — should default to true
+	let host1 = body.as_array().unwrap().iter().find(|h| h["id"] == "host1").unwrap();
+	assert_eq!(host1["can_reach_external_services"], true,
+		"can_reach_external_services should default to true when absent from YAML");
+
+	// host2 explicitly sets can_reach_external_services: false
+	let host2 = body.as_array().unwrap().iter().find(|h| h["id"] == "host2").unwrap();
+	assert_eq!(host2["can_reach_external_services"], false,
+		"can_reach_external_services: false should be honoured");
 }
 
 #[tokio::test]
