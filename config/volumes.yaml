@@ -27,6 +27,10 @@ lucos_docker_mirror_cache:
     description: Cached Docker image layers pulled through from Docker Hub
     recreate_effort: automatic
     skip_backup: true
+lucos_docker_mirror_logs:
+    description: nginx access logs for the docker mirror, used for pull-rate canary metric
+    recreate_effort: automatic
+    skip_backup: true
 lucos_eolas_db_data:
     description: Personally curated Knowledge Graph
     recreate_effort: considerable
