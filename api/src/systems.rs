@@ -4,7 +4,15 @@ use axum::{
 	response::Response,
 	http::header::HeaderMap,
 };
+use serde::Serialize;
 use crate::conneg::negotiate_response;
+
+#[derive(Serialize, Clone)]
+struct SystemWithSubdomainStart {
+	#[serde(flatten)]
+	system: crate::data::System,
+	subdomain_start: Option<String>,
+}
 
 pub async fn all(
 	State(data): State<Arc<crate::data::Data>>,
@@ -20,8 +28,18 @@ pub async fn subdomain(
 	headers: HeaderMap,
 	params: Query<crate::conneg::Params>,
 ) -> Response {
-	let subdomains = data.get_systems_filtered(|system| system.domain.as_ref().is_some_and(|domain| domain.ends_with(&root_domain)));
-	negotiate_response(&headers, params, subdomains)
+	let systems = data.get_systems_filtered(|system| system.domain.as_ref().is_some_and(|domain| domain.ends_with(&root_domain)));
+	let systems_with_start: Vec<SystemWithSubdomainStart> = systems
+		.into_iter()
+		.map(|system| {
+			let subdomain_start = system.domain.as_ref()
+				.and_then(|domain| domain.strip_suffix(root_domain.as_str()))
+				.map(|prefix| prefix.trim_end_matches('.').to_string())
+				.filter(|s| !s.is_empty());
+			SystemWithSubdomainStart { system, subdomain_start }
+		})
+		.collect();
+	negotiate_response(&headers, params, systems_with_start)
 }
 
 pub async fn http(
