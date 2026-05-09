@@ -106,11 +106,11 @@ async fn test_systems_subdomain() {
 	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
 	assert_eq!(body.as_array().unwrap().len(), 1);
 	assert_eq!(body[0]["domain"], "s1.example.com");
-	assert_eq!(body[0]["subdomain_start"], "s1");
+	assert_eq!(body[0]["subdomain"], "s1");
 }
 
 #[tokio::test]
-async fn test_systems_subdomain_start_multiple() {
+async fn test_systems_subdomain_multiple() {
 	let data = create_mock_data().await;
 	let app = app(data);
 
@@ -127,10 +127,10 @@ async fn test_systems_subdomain_start_multiple() {
 	assert_eq!(systems.len(), 2);
 
 	let system1 = systems.iter().find(|s| s["id"] == "system1").unwrap();
-	assert_eq!(system1["subdomain_start"], "s1.example");
+	assert_eq!(system1["subdomain"], "s1.example");
 
 	let system2 = systems.iter().find(|s| s["id"] == "system2").unwrap();
-	assert_eq!(system2["subdomain_start"], "s2.test");
+	assert_eq!(system2["subdomain"], "s2.test");
 }
 
 #[tokio::test]

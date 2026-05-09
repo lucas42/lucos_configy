@@ -8,10 +8,10 @@ use serde::Serialize;
 use crate::conneg::negotiate_response;
 
 #[derive(Serialize, Clone)]
-struct SystemWithSubdomainStart {
+struct SystemWithSubdomain {
 	#[serde(flatten)]
 	system: crate::data::System,
-	subdomain_start: Option<String>,
+	subdomain: Option<String>,
 }
 
 pub async fn all(
@@ -29,17 +29,17 @@ pub async fn subdomain(
 	params: Query<crate::conneg::Params>,
 ) -> Response {
 	let systems = data.get_systems_filtered(|system| system.domain.as_ref().is_some_and(|domain| domain.ends_with(&root_domain)));
-	let systems_with_start: Vec<SystemWithSubdomainStart> = systems
+	let systems_with_subdomain: Vec<SystemWithSubdomain> = systems
 		.into_iter()
 		.map(|system| {
-			let subdomain_start = system.domain.as_ref()
+			let subdomain = system.domain.as_ref()
 				.and_then(|domain| domain.strip_suffix(root_domain.as_str()))
 				.map(|prefix| prefix.trim_end_matches('.').to_string())
 				.filter(|s| !s.is_empty());
-			SystemWithSubdomainStart { system, subdomain_start }
+			SystemWithSubdomain { system, subdomain }
 		})
 		.collect();
-	negotiate_response(&headers, params, systems_with_start)
+	negotiate_response(&headers, params, systems_with_subdomain)
 }
 
 pub async fn http(
