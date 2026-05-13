@@ -155,6 +155,7 @@ lucos_schedule_tracker:
     http_port: 8024
     hosts:
         - avalon
+    unsupervisedAgentCode: true
 lucos_static_media:
     domain: staticmedia.l42.eu
     http_port: 8017
