@@ -11,6 +11,7 @@ aurora:
 avalon:
     domain: avalon.s.l42.eu
     ipv4: 178.32.218.44
+    ipv6: 2001:41d0:8:dc2c::1
     serves_http: true
 salvare:
     domain: salvare.s.l42.eu
