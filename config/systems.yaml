@@ -54,6 +54,11 @@ lucos_eolas:
     http_port: 8032
     hosts:
         - avalon
+lucos_firewall:
+    hosts:
+        - avalon
+        - salvare
+        - xwing
 lucos_locations:
     domain: locations.l42.eu
     http_port: 8028
