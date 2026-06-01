@@ -1,11 +1,43 @@
 use serde_yaml_ng;
-use serde::{Serialize, Deserialize};
+use serde::{Serialize, Deserialize, Deserializer};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::vec::Vec;
 use std::path::Path;
 
 fn default_true() -> bool { true }
+
+/// Custom deserializer that rejects port 0 (valid TCP ports are 1–65535).
+fn validate_port<'de, D>(deserializer: D) -> Result<u16, D::Error>
+where
+	D: Deserializer<'de>,
+{
+	let port = u16::deserialize(deserializer)?;
+	if port == 0 {
+		return Err(serde::de::Error::custom("port must be between 1 and 65535 (got 0)"));
+	}
+	Ok(port)
+}
+
+/// Network protocol for a public port declaration.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum Protocol {
+	Tcp,
+	Udp,
+}
+
+/// A single public port entry on a system.
+#[derive(Serialize, Deserialize, Clone)]
+pub struct PublicPort {
+	/// TCP/UDP port number (1–65535).
+	#[serde(deserialize_with = "validate_port")]
+	pub port: u16,
+	/// Network protocol: "tcp" or "udp".
+	pub protocol: Protocol,
+	/// Human-readable description of what this port is used for.
+	pub purpose: String,
+}
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct System {
@@ -16,6 +48,10 @@ pub struct System {
 	pub hosts: Vec<String>,
 	#[serde(rename = "unsupervisedAgentCode", default)]
 	pub unsupervised_agent_code: bool,
+	/// Ports that are publicly reachable on this system's host.
+	/// Used by lucos_firewall to generate iptables rules.
+	#[serde(default)]
+	pub public_ports: Vec<PublicPort>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

@@ -10,6 +10,7 @@ Configuration Management System for the LucOS ecosystem
 * `/systems/subdomain/{root_domain}` - Lists systems whose domain ends with the given {root_domain}.
 * `/systems/http` - Lists systems which have a `http_port`.
 * `/systems/host/{host}` - Lists systems whose `hosts` list contains the given {host}.
+* `/systems/host/{host}/public-ports` - Returns a flat list of `{system, port, protocol, purpose}` records for all public ports declared on systems whose `hosts` list contains the given {host}. Intended for consumption by the firewall generator.
 * `/volumes` - Lists all volumes.
 * `/hosts` - Lists all hosts.
 * `/hosts/http` - Lists hosts which serve http.
@@ -67,6 +68,38 @@ The same shape applies to other languages with similar idioms (e.g. Java/Kotlin 
 
 When testing consumers, exercise them against the live configy API or a fixture that mirrors its serialisation (every key present, with `null` for absent values). A YAML-only fixture where the key is omitted does **not** match the API's behaviour and will hide this class of bug — see the [2026-04-28 lucos_backups Aurora cron incident](https://github.com/lucas42/lucos/blob/main/docs/incidents/2026-04-28-backups-aurora-null-config-cron-failure.md) for an example of how this fails in practice.
 
+
+## System fields
+
+| Field | Type | Description |
+|---|---|---|
+| `domain` | string (optional) | Public-facing domain for this system. |
+| `http_port` | integer (optional) | Internal port on which this system serves HTTP traffic (router backend). |
+| `hosts` | list of strings | Host(s) this system runs on. |
+| `unsupervisedAgentCode` | boolean (default: false) | Whether this system's code may be changed by AI agents without human review. |
+| `public_ports` | list of port entries (default: []) | Ports that are publicly reachable on this system's host(s). Used by `lucos_firewall` to generate iptables rules. See below. |
+
+### `public_ports` entries
+
+Each entry in `public_ports` has three required fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `port` | integer (1–65535) | Port number. |
+| `protocol` | string: `tcp` or `udp` | Network protocol. Invalid values cause config load to fail. |
+| `purpose` | string | Free-form human-readable description of what this port is used for. |
+
+Example:
+
+```yaml
+lucos_mail:
+    domain: mail.l42.eu
+    http_port: 8022
+    hosts: [avalon]
+    public_ports:
+        - { port: 25, protocol: tcp, purpose: "SMTP inbound" }
+        - { port: 587, protocol: tcp, purpose: "SMTP submission" }
+```
 
 ## Updating the data
 Edit YAML files in the `config` directory.
