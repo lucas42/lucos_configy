@@ -28,8 +28,8 @@ lucos_docker_mirror_logs:
     recreate_effort: automatic
     skip_backup: true
 lucos_eolas_db_data:
-    description: Personally curated Knowledge Graph
-    recreate_effort: considerable
+    description: Personally curated knowledge graph, including concepts like people, places & events
+    recreate_effort: huge
 lucos_locations_config:
     description: Configuration for OwnTracks Recorder
     recreate_effort: automatic
