@@ -28,7 +28,7 @@ lucos_docker_mirror_logs:
     recreate_effort: automatic
     skip_backup: true
 lucos_eolas_db_data:
-    description: Personally curated knowledge graph, including canonical media entity data (artists, albums, persons) migrated from lucos_media_metadata_api
+    description: Personally curated knowledge graph of people, places, events and concepts
     recreate_effort: huge
 lucos_locations_config:
     description: Configuration for OwnTracks Recorder
@@ -57,7 +57,7 @@ lucos_media_manager_stateFile:
     recreate_effort: tolerable
 lucos_media_metadata_api_db:
     description: Data about media files
-    recreate_effort: considerable
+    recreate_effort: huge
 lucos_media_metadata_api_exports:
     description: Automated exports of media metadata
     recreate_effort: automatic
