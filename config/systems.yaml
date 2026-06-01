@@ -32,11 +32,16 @@ lucos_creds:
     http_port: 8031
     hosts:
         - avalon
+    public_ports:
+        - { port: 2202, protocol: tcp, purpose: "SSH endpoint for creds read/write" }
 lucos_deploy_orb:
 lucos_dns:
     domain: dns.l42.eu
     hosts:
         - avalon
+    public_ports:
+        - { port: 53, protocol: tcp, purpose: "DNS (TCP fallback)" }
+        - { port: 53, protocol: udp, purpose: "DNS (primary)" }
 lucos_docker_health:
     unsupervisedAgentCode: true
     hosts:
@@ -64,6 +69,8 @@ lucos_locations:
     http_port: 8028
     hosts:
         - avalon
+    public_ports:
+        - { port: 8883, protocol: tcp, purpose: "MQTT — anonymous-disabled, TLS + password" }
 lucos_loganne:
     domain: loganne.l42.eu
     http_port: 8019
@@ -74,6 +81,8 @@ lucos_mail:
     http_port: 8022
     hosts:
         - avalon
+    public_ports:
+        - { port: 25, protocol: tcp, purpose: "SMTP inbound" }
 lucos_media_import:
     hosts:
         - xwing
@@ -144,6 +153,9 @@ lucos_router:
     hosts:
         - avalon
         - xwing
+    public_ports:
+        - { port: 80,  protocol: tcp, purpose: "HTTP (Let's Encrypt + redirect to HTTPS)" }
+        - { port: 443, protocol: tcp, purpose: "HTTPS — TLS termination + domain routing" }
 lucos_scenes:
     domain: scenes.l42.eu
     http_port: 8026
