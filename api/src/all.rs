@@ -29,6 +29,7 @@ fn turtle_ontology() -> String {
 		("Volume", "Volume"),
 		("Component", "Component"),
 		("Script", "Script"),
+		("PublicPort", "Public Port"),
 	] {
 		out.push_str(&format!(
 			"\nconfigy:{class}\n    a owl:Class ;\n    skos:prefLabel \"{label}\" ;\n    eolas:hasCategory eolas:Technological .\n"
@@ -54,6 +55,10 @@ fn turtle_ontology() -> String {
 		("recreateEffort", "Recreate Effort", "configy:Volume", "xsd:string"),
 		("skipBackup", "Skip Backup", "configy:Volume", "xsd:boolean"),
 		("skipBackupOnHost", "Skip Backup On Host", "configy:Volume", "configy:Host"),
+		("publicPort", "Public Port", "configy:System", "configy:PublicPort"),
+		("portNumber", "Port Number", "configy:PublicPort", "xsd:integer"),
+		("portProtocol", "Port Protocol", "configy:PublicPort", "xsd:string"),
+		("portPurpose", "Port Purpose", "configy:PublicPort", "xsd:string"),
 	] {
 		out.push_str(&format!(
 			"\nconfigy:{pred}\n    a rdf:Property ;\n    rdfs:label \"{label}\" ;\n    rdfs:domain {domain} ;\n    rdfs:range {range} .\n"
@@ -82,6 +87,18 @@ fn turtle_systems(systems: &[System], base: &str) -> String {
 		}
 		if system.unsupervised_agent_code {
 			out.push_str(" ;\n    configy:unsupervisedAgentCode true");
+		}
+		for port in &system.public_ports {
+			let protocol_str = match port.protocol {
+				crate::data::Protocol::Tcp => "tcp",
+				crate::data::Protocol::Udp => "udp",
+			};
+			out.push_str(&format!(
+				" ;\n    configy:publicPort [\n        a configy:PublicPort ;\n        configy:portNumber {} ;\n        configy:portProtocol \"{}\" ;\n        configy:portPurpose \"{}\"\n    ]",
+				port.port,
+				protocol_str,
+				escape_turtle_literal(&port.purpose),
+			));
 		}
 		out.push_str(" .\n");
 	}

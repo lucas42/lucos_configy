@@ -22,10 +22,24 @@ system1:
   http_port: 80
   hosts: [host1]
   unsupervisedAgentCode: true
+  public_ports:
+    - port: 25
+      protocol: tcp
+      purpose: SMTP inbound
+    - port: 587
+      protocol: tcp
+      purpose: SMTP submission
 system2:
   domain: s2.test.com
   http_port: 8080
   hosts: [host1, host2]
+system3:
+  domain: s3.other.net
+  hosts: [host2]
+  public_ports:
+    - port: 53
+      protocol: udp
+      purpose: DNS
 ").unwrap();
 
 	let volumes_path = dir.path().join("volumes.yaml");
@@ -88,7 +102,7 @@ async fn test_systems_all() {
 
 	let body = response.into_body().collect().await.unwrap().to_bytes();
 	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
-	assert_eq!(body.as_array().unwrap().len(), 2);
+	assert_eq!(body.as_array().unwrap().len(), 3);
 }
 
 #[tokio::test]
@@ -162,8 +176,12 @@ async fn test_systems_host() {
 	assert_eq!(response.status(), StatusCode::OK);
 	let body = response.into_body().collect().await.unwrap().to_bytes();
 	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
-	assert_eq!(body.as_array().unwrap().len(), 1);
-	assert_eq!(body[0]["id"], "system2");
+	assert_eq!(body.as_array().unwrap().len(), 2);
+	let ids: Vec<&str> = body.as_array().unwrap().iter()
+		.map(|s| s["id"].as_str().unwrap())
+		.collect();
+	assert!(ids.contains(&"system2"));
+	assert!(ids.contains(&"system3"));
 }
 
 #[tokio::test]
@@ -699,4 +717,211 @@ async fn test_all_json_fallback() {
 	assert!(body.get("volumes").is_some());
 	assert!(body.get("components").is_some());
 	assert!(body.get("scripts").is_some());
+}
+
+// ── public_ports field and endpoint tests ──────────────────────────────────────
+
+#[tokio::test]
+async fn test_systems_include_public_ports() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/systems").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+
+	let system1 = body.as_array().unwrap().iter().find(|s| s["id"] == "system1").unwrap();
+	let ports = system1["public_ports"].as_array().unwrap();
+	assert_eq!(ports.len(), 2);
+	assert_eq!(ports[0]["port"], 25);
+	assert_eq!(ports[0]["protocol"], "tcp");
+	assert_eq!(ports[0]["purpose"], "SMTP inbound");
+	assert_eq!(ports[1]["port"], 587);
+	assert_eq!(ports[1]["protocol"], "tcp");
+
+	// system2 has no public_ports — should be an empty array, not null or absent
+	let system2 = body.as_array().unwrap().iter().find(|s| s["id"] == "system2").unwrap();
+	assert_eq!(system2["public_ports"].as_array().unwrap().len(), 0);
+}
+
+#[tokio::test]
+async fn test_host_public_ports_endpoint() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/systems/host/host1/public-ports").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+	let ports = body.as_array().unwrap();
+
+	// host1 has system1 (2 ports) and system2 (0 ports) → 2 records total
+	assert_eq!(ports.len(), 2);
+
+	// All records for host1 come from system1
+	for port in ports {
+		assert_eq!(port["system"], "system1");
+	}
+	// The two expected ports
+	let p25 = ports.iter().find(|p| p["port"] == 25).unwrap();
+	assert_eq!(p25["protocol"], "tcp");
+	assert_eq!(p25["purpose"], "SMTP inbound");
+
+	let p587 = ports.iter().find(|p| p["port"] == 587).unwrap();
+	assert_eq!(p587["protocol"], "tcp");
+}
+
+#[tokio::test]
+async fn test_host_public_ports_endpoint_host2() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/systems/host/host2/public-ports").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+	let ports = body.as_array().unwrap();
+
+	// host2 has system2 (0 ports) and system3 (1 UDP port) → 1 record total
+	assert_eq!(ports.len(), 1);
+	assert_eq!(ports[0]["system"], "system3");
+	assert_eq!(ports[0]["port"], 53);
+	assert_eq!(ports[0]["protocol"], "udp");
+	assert_eq!(ports[0]["purpose"], "DNS");
+}
+
+#[tokio::test]
+async fn test_host_public_ports_empty_host() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/systems/host/nonexistent/public-ports").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+	assert_eq!(body.as_array().unwrap().len(), 0);
+}
+
+#[tokio::test]
+async fn test_all_turtle_contains_public_ports_ontology() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/all")
+				.header("Accept", "text/turtle")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body = std::str::from_utf8(&body).unwrap();
+
+	// Ontology declares PublicPort class and its predicates
+	assert!(body.contains("configy:PublicPort"));
+	assert!(body.contains("configy:publicPort"));
+	assert!(body.contains("configy:portNumber"));
+	assert!(body.contains("configy:portProtocol"));
+	assert!(body.contains("configy:portPurpose"));
+}
+
+#[tokio::test]
+async fn test_all_turtle_contains_public_port_data() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/all")
+				.header("Accept", "text/turtle")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body = std::str::from_utf8(&body).unwrap();
+
+	// system1 has public ports — they should appear as blank nodes
+	assert!(body.contains("configy:portNumber 25"));
+	assert!(body.contains("configy:portProtocol \"tcp\""));
+	assert!(body.contains("configy:portPurpose \"SMTP inbound\""));
+	assert!(body.contains("configy:portNumber 53"));
+	assert!(body.contains("configy:portProtocol \"udp\""));
+	assert!(body.contains("configy:portPurpose \"DNS\""));
+}
+
+#[test]
+fn test_public_ports_invalid_protocol_fails_load() {
+	use lucos_configy_api::data::Data;
+	use tempfile::tempdir;
+
+	let dir = tempdir().unwrap();
+
+	// Write a systems.yaml with an invalid protocol value
+	let systems_path = dir.path().join("systems.yaml");
+	std::fs::write(&systems_path, "
+broken:
+  hosts: [host1]
+  public_ports:
+    - port: 80
+      protocol: ftp
+      purpose: Should fail
+").unwrap();
+
+	// Write minimal stubs for the other YAML files so from_dir doesn't fail on file-not-found
+	std::fs::write(dir.path().join("volumes.yaml"), "{}\n").unwrap();
+	std::fs::write(dir.path().join("hosts.yaml"), "{}\n").unwrap();
+	std::fs::write(dir.path().join("components.yaml"), "{}\n").unwrap();
+	std::fs::write(dir.path().join("scripts.yaml"), "{}\n").unwrap();
+
+	let result = Data::from_dir(dir.path());
+	assert!(result.is_err(), "Expected config load to fail on invalid protocol 'ftp'");
+}
+
+#[test]
+fn test_public_ports_invalid_port_zero_fails_load() {
+	use lucos_configy_api::data::Data;
+	use tempfile::tempdir;
+
+	let dir = tempdir().unwrap();
+
+	std::fs::write(dir.path().join("systems.yaml"), "
+broken:
+  hosts: [host1]
+  public_ports:
+    - port: 0
+      protocol: tcp
+      purpose: Port zero is invalid
+").unwrap();
+	std::fs::write(dir.path().join("volumes.yaml"), "{}\n").unwrap();
+	std::fs::write(dir.path().join("hosts.yaml"), "{}\n").unwrap();
+	std::fs::write(dir.path().join("components.yaml"), "{}\n").unwrap();
+	std::fs::write(dir.path().join("scripts.yaml"), "{}\n").unwrap();
+
+	let result = Data::from_dir(dir.path());
+	assert!(result.is_err(), "Expected config load to fail on port 0");
 }

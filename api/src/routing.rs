@@ -14,6 +14,7 @@ pub fn app(arc_data: Arc<crate::data::Data>) -> Router {
 		.route("/systems/subdomain/{root_domain}", get(crate::systems::subdomain))
 		.route("/systems/http", get(crate::systems::http))
 		.route("/systems/host/{host}", get(crate::systems::host))
+		.route("/systems/host/{host}/public-ports", get(crate::systems::host_public_ports))
 		.route("/systems{*_subpath}", get(Redirect::temporary("/systems")))
 		.route("/volumes", get(crate::volumes::all))
 		.route("/volumes{*_subpath}", get(Redirect::temporary("/volumes")))
