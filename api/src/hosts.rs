@@ -1,10 +1,10 @@
 use std::sync::Arc;
 use axum::{
-	extract::{Query, State},
+	extract::{Query, Path, State},
 	response::Response,
 	http::header::HeaderMap,
 };
-use crate::conneg::negotiate_response;
+use crate::conneg::{negotiate_response, negotiate_response_single};
 
 pub async fn all(
 	State(data): State<Arc<crate::data::Data>>,
@@ -21,4 +21,14 @@ pub async fn http(
 ) -> Response {
 	let http_hosts = data.get_hosts_filtered(|host| host.serves_http);
 	negotiate_response(&headers, params, http_hosts)
+}
+
+pub async fn get(
+	Path(host_id): Path<String>,
+	State(data): State<Arc<crate::data::Data>>,
+	headers: HeaderMap,
+	params: Query<crate::conneg::Params>,
+) -> Response {
+	let item = data.get_host(&host_id);
+	negotiate_response_single(&headers, params, item)
 }

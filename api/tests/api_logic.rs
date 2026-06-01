@@ -65,6 +65,10 @@ host2:
   ipv4: 1.1.1.2
   serves_http: false
   can_reach_external_services: false
+host3:
+  domain: h3.example.com
+  ipv4: 1.1.1.3
+  firewall_enforce: true
 ").unwrap();
 
 	let components_path = dir.path().join("components.yaml");
@@ -213,7 +217,7 @@ async fn test_hosts_all() {
 	assert_eq!(response.status(), StatusCode::OK);
 	let body = response.into_body().collect().await.unwrap().to_bytes();
 	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
-	assert_eq!(body.as_array().unwrap().len(), 2);
+	assert_eq!(body.as_array().unwrap().len(), 3);
 }
 
 #[tokio::test]
@@ -924,4 +928,128 @@ broken:
 
 	let result = Data::from_dir(dir.path());
 	assert!(result.is_err(), "Expected config load to fail on port 0");
+}
+
+// ── /hosts/{host} endpoint tests ─────────────────────────────────────────────
+
+#[tokio::test]
+async fn test_hosts_get_by_id() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/hosts/host1").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	assert_eq!(response.headers().get("content-type").unwrap(), "application/json");
+
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+
+	// Single object, not an array
+	assert!(body.as_object().is_some());
+	assert_eq!(body["id"], "host1");
+	assert_eq!(body["domain"], "h1.example.com");
+	assert_eq!(body["ipv4"], "1.1.1.1");
+	assert_eq!(body["serves_http"], true);
+}
+
+#[tokio::test]
+async fn test_hosts_get_firewall_enforce_default_false() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/hosts/host1").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+
+	// host1 does not set firewall_enforce — should default to false
+	assert_eq!(body["firewall_enforce"], false,
+		"firewall_enforce should default to false when absent from YAML");
+}
+
+#[tokio::test]
+async fn test_hosts_get_firewall_enforce_true() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/hosts/host3").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::OK);
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
+
+	// host3 explicitly sets firewall_enforce: true
+	assert_eq!(body["firewall_enforce"], true,
+		"firewall_enforce: true should be honoured");
+}
+
+#[tokio::test]
+async fn test_hosts_get_not_found() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(Request::builder().uri("/hosts/nonexistent").body(Body::empty()).unwrap())
+		.await
+		.unwrap();
+
+	assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn test_all_turtle_contains_firewall_enforce_ontology() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/all")
+				.header("Accept", "text/turtle")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body = std::str::from_utf8(&body).unwrap();
+
+	assert!(body.contains("configy:firewallEnforce"),
+		"Turtle output should declare firewallEnforce predicate in ontology");
+}
+
+#[tokio::test]
+async fn test_all_turtle_contains_firewall_enforce_data() {
+	let data = create_mock_data().await;
+	let app = app(data);
+
+	let response = app
+		.oneshot(
+			Request::builder()
+				.uri("/all")
+				.header("Accept", "text/turtle")
+				.body(Body::empty())
+				.unwrap(),
+		)
+		.await
+		.unwrap();
+
+	let body = response.into_body().collect().await.unwrap().to_bytes();
+	let body = std::str::from_utf8(&body).unwrap();
+
+	// host3 has firewall_enforce: true — should appear in turtle output
+	assert!(body.contains("configy:firewallEnforce true"),
+		"Turtle output should include firewallEnforce true for host3");
 }

@@ -81,6 +81,8 @@ pub struct Host {
 	pub shell_flavour: Option<String>, // "gnu" (default) or "busybox"
 	#[serde(default = "default_true")]
 	pub can_reach_external_services: bool, // whether this host can wget/curl from public HTTPS (e.g. GitHub codeload); defaults true
+	#[serde(default)]
+	pub firewall_enforce: bool, // whether lucos_firewall is in enforce mode on this host (false = dry-run); defaults false
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -199,6 +201,11 @@ impl Data {
 			.into_iter()
 			.filter(predicate)
 			.collect()
+	}
+	/// Look up a single host by id, returning its config as a JSON Value, or `None` if not found.
+	pub fn get_host(&self, id: &str) -> Option<Value> {
+		self.hosts.iter().find(|h| h.id.as_deref() == Some(id))
+			.map(|h| serde_json::to_value(h).unwrap())
 	}
 	pub fn get_components(&self) -> Vec<Component> {
 		self.components.clone()

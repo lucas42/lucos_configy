@@ -52,6 +52,7 @@ fn turtle_ontology() -> String {
 		("isStorageOnly", "Is Storage Only", "configy:Host", "xsd:boolean"),
 		("shellFlavour", "Shell Flavour", "configy:Host", "xsd:string"),
 		("canReachExternalServices", "Can Reach External Services", "configy:Host", "xsd:boolean"),
+		("firewallEnforce", "Firewall Enforce", "configy:Host", "xsd:boolean"),
 		("recreateEffort", "Recreate Effort", "configy:Volume", "xsd:string"),
 		("skipBackup", "Skip Backup", "configy:Volume", "xsd:boolean"),
 		("skipBackupOnHost", "Skip Backup On Host", "configy:Volume", "configy:Host"),
@@ -142,6 +143,9 @@ fn turtle_hosts(hosts: &[Host], base: &str) -> String {
 		}
 		if !host.can_reach_external_services {
 			out.push_str(" ;\n    configy:canReachExternalServices false");
+		}
+		if host.firewall_enforce {
+			out.push_str(" ;\n    configy:firewallEnforce true");
 		}
 		out.push_str(" .\n");
 	}
