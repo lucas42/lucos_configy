@@ -14,6 +14,13 @@ struct InfoCI {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
+struct Check {
+	ok: bool,
+	tech_detail: &'static str,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 struct Metric {
 	tech_detail: &'static str,
 	value: u8,
@@ -26,6 +33,7 @@ struct InfoResponse {
 	network_only: bool,
 	show_on_homepage: bool,
 	ci: InfoCI,
+	checks: HashMap<&'static str, Check>,
 	metrics: HashMap<&'static str, Metric>,
 }
 
@@ -61,6 +69,7 @@ pub async fn controller(
 		},
 		network_only: true,
 		show_on_homepage: false,
+		checks: HashMap::new(),
 		metrics: metrics,
 	})
 }
