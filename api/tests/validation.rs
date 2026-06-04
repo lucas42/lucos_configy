@@ -30,12 +30,14 @@ fn validate_config_files() {
 	assert!(data.system_count() > 0, "No systems found in config");
 	assert!(data.host_count() > 0, "No hosts found in config");
 
-	// A system with a domain must have at most one host, to prevent silent DNS misconfiguration
+	// An HTTP service with a domain must have at most one host, to prevent silent DNS misconfiguration.
+	// Non-HTTP services (http_port is None) may legitimately run on multiple hosts — e.g. a DNS
+	// nameserver pair where the secondary has a different hostname and does not serve the domain.
 	for system in data.get_systems() {
-		if system.domain.is_some() {
+		if system.domain.is_some() && system.http_port.is_some() {
 			assert!(
 				system.hosts.len() <= 1,
-				"System with domain must have at most one host, but has {}: {:?}",
+				"HTTP system with domain must have at most one host, but has {}: {:?}",
 				system.hosts.len(),
 				system.domain
 			);
