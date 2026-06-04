@@ -39,6 +39,7 @@ lucos_dns:
     domain: dns.l42.eu
     hosts:
         - avalon
+        - xwing
     public_ports:
         - { port: 53, protocol: tcp, purpose: "DNS (TCP fallback)" }
         - { port: 53, protocol: udp, purpose: "DNS (primary)" }
