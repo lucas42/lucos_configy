@@ -42,6 +42,13 @@ lucos_dns:
     public_ports:
         - { port: 53, protocol: tcp, purpose: "DNS (TCP fallback)" }
         - { port: 53, protocol: udp, purpose: "DNS (primary)" }
+lucos_dns_secondary:
+    domain: dns2.l42.eu
+    hosts:
+        - xwing
+    public_ports:
+        - { port: 53, protocol: tcp, purpose: "DNS (TCP fallback)" }
+        - { port: 53, protocol: udp, purpose: "DNS (secondary)" }
 lucos_docker_health:
     unsupervisedAgentCode: true
     hosts:

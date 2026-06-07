@@ -19,6 +19,10 @@ lucos_creds_store:
 lucos_dns_generatedzones:
     description: DNS zonefiles which have been automatically generated from lucos_configy data
     recreate_effort: small
+lucos_dns_secondary_secondaryzones:
+    description: DNS zone files received via AXFR/IXFR from the avalon primary; allows the secondary to serve last-known-good zones if the primary is temporarily unreachable
+    recreate_effort: automatic
+    skip_backup: true
 lucos_docker_mirror_cache:
     description: Cached Docker image layers pulled through from Docker Hub
     recreate_effort: automatic
