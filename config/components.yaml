@@ -4,7 +4,6 @@ lucos_loganne_pythonclient:
 lucos_navbar:
 lucos_pubsub:
 lucos_schedule_tracker_pythonclient:
-lucos_scheduled_scripts:
 lucos_search_component:
 lucos_time_component:
 lukeblaney_cv:
