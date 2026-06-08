@@ -16,6 +16,10 @@ lucos_contacts_db_data:
 lucos_creds_store:
     description: Credentials used by lucos services.  Both between services within lucos and to third party services.
     recreate_effort: considerable
+lucos_dns_configy-sync-cache:
+    description: Last-known-good configy payload for config-sync, used as fallback when configy is unreachable during a DNS outage
+    recreate_effort: low
+    skip_backup: true
 lucos_dns_generatedzones:
     description: DNS zonefiles which have been automatically generated from lucos_configy data
     recreate_effort: small
