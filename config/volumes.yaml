@@ -18,7 +18,7 @@ lucos_creds_store:
     recreate_effort: considerable
 lucos_dns_configy-sync-cache:
     description: Last-known-good configy payload for config-sync, used as fallback when configy is unreachable during a DNS outage
-    recreate_effort: low
+    recreate_effort: automatic
     skip_backup: true
 lucos_dns_generatedzones:
     description: DNS zonefiles which have been automatically generated from lucos_configy data
