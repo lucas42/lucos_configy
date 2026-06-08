@@ -59,6 +59,7 @@ lucos_media_import_state:
 lucos_media_manager_stateFile:
     description: The current state of media player, including playlist, volume, is-playing and connected devices.
     recreate_effort: tolerable
+    tolerate_live_file: true
 lucos_media_metadata_api_db:
     description: Data about media files
     recreate_effort: huge

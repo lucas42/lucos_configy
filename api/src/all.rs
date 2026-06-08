@@ -172,6 +172,9 @@ fn turtle_volumes(volumes: &[Volume], base: &str) -> String {
 		for host in &volume.skip_backup_on_hosts {
 			out.push_str(&format!(" ;\n    configy:skipBackupOnHost <{base}/hosts#{host}>"));
 		}
+		if volume.tolerate_live_file {
+			out.push_str(" ;\n    configy:tolerateLiveFile true");
+		}
 		out.push_str(" .\n");
 	}
 	out

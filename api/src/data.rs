@@ -63,6 +63,8 @@ pub struct Volume {
 	pub skip_backup: bool,
 	#[serde(default)]
 	pub skip_backup_on_hosts: Vec<String>,
+	#[serde(default)]
+	pub tolerate_live_file: bool, // when true, lucos_backups tolerates tar exit code 1 (file changed while reading) for live-file volumes
 }
 
 #[derive(Serialize, Deserialize, Clone)]
