@@ -28,3 +28,4 @@ xwing:
     ipv6: 2a01:4b00:8598:5a00:ba27:ebff:fe83:e1ee
     ipv4_nat: 152.37.104.10
     serves_http: true
+    firewall_enforce: true
