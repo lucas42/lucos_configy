@@ -1,5 +1,7 @@
 .github:
   unsupervisedAgentCode: true
+lucos_auth_scopes:
+  unsupervisedAgentCode: false
 lucos_loganne_pythonclient:
 lucos_navbar:
 lucos_pubsub:
