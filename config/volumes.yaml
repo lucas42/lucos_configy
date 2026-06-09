@@ -1,4 +1,7 @@
 
+lucos_aithne_credential_store:
+    description: SQLite credential and principal store for lucos_aithne — holds passkey credentials and principal records
+    recreate_effort: considerable
 lucos_arachne_fuseki_data:
     description: Data from the arachne triple store, gathered from other lucOS systems
     recreate_effort: automatic
