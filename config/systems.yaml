@@ -1,3 +1,9 @@
+lucos_aithne:
+    domain: aithne.l42.eu
+    http_port: 8039
+    hosts:
+        - avalon
+    unsupervisedAgentCode: true
 lucos_arachne:
     domain: arachne.l42.eu
     http_port: 8033
