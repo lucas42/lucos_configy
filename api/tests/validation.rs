@@ -60,6 +60,42 @@ fn repository_ids_are_unique_across_types() {
 	}
 }
 
+/// Recognised `recreate_effort` ids. The canonical source of truth for this set
+/// is `lucos_backups/src/effort_labels.yaml` — lucos_backups looks each volume's
+/// `recreate_effort` up against it unguarded, so an unrecognised (or missing)
+/// value crashes host-tracking for an entire host in production. This is a
+/// deliberate duplication: if lucos_backups ever adds or renames an effort label,
+/// this constant must be updated in lockstep. See lucas42/lucos_configy#221.
+const RECOGNISED_EFFORTS: [&str; 7] = [
+	"small",
+	"considerable",
+	"huge",
+	"automatic",
+	"tolerable",
+	"remote",
+	"unknown",
+];
+
+#[test]
+fn recreate_effort_is_present_and_recognised() {
+	let data = load_test_data();
+
+	for volume in data.get_volumes() {
+		let id = volume.id.as_deref().unwrap_or("<unknown>");
+		match &volume.recreate_effort {
+			None => panic!(
+				"Volume {:?} is missing recreate_effort; it must be one of {:?}",
+				id, RECOGNISED_EFFORTS
+			),
+			Some(effort) => assert!(
+				RECOGNISED_EFFORTS.contains(&effort.as_str()),
+				"Volume {:?} has unrecognised recreate_effort {:?}; it must be one of {:?}",
+				id, effort, RECOGNISED_EFFORTS
+			),
+		}
+	}
+}
+
 #[test]
 fn config_files_are_sorted_alphabetically() {
 	let config_files = ["systems.yaml", "volumes.yaml", "hosts.yaml", "components.yaml", "scripts.yaml"];
