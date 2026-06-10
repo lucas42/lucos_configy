@@ -54,6 +54,7 @@ fn turtle_ontology() -> String {
 		("canReachExternalServices", "Can Reach External Services", "configy:Host", "xsd:boolean"),
 		("firewallEnforce", "Firewall Enforce", "configy:Host", "xsd:boolean"),
 		("recreateEffort", "Recreate Effort", "configy:Volume", "xsd:string"),
+		("backupStrategy", "Backup Strategy", "configy:Volume", "xsd:string"),
 		("skipBackup", "Skip Backup", "configy:Volume", "xsd:boolean"),
 		("skipBackupOnHost", "Skip Backup On Host", "configy:Volume", "configy:Host"),
 		("publicPort", "Public Port", "configy:System", "configy:PublicPort"),
@@ -165,6 +166,9 @@ fn turtle_volumes(volumes: &[Volume], base: &str) -> String {
 		}
 		if let Some(effort) = &volume.recreate_effort {
 			out.push_str(&format!(" ;\n    configy:recreateEffort \"{}\"", escape_turtle_literal(effort)));
+		}
+		if let Some(strategy) = &volume.backup_strategy {
+			out.push_str(&format!(" ;\n    configy:backupStrategy \"{}\"", escape_turtle_literal(strategy)));
 		}
 		if volume.skip_backup {
 			out.push_str(" ;\n    configy:skipBackup true");

@@ -63,6 +63,11 @@ pub struct Volume {
 	pub skip_backup: bool,
 	#[serde(default)]
 	pub skip_backup_on_hosts: Vec<String>,
+	// Which backup mechanism lucos_backups uses for this volume.
+	// Absent / "full-snapshot" = the default daily full tar+scp; "incremental"
+	// opts into rsync --link-dest hardlink-rotated snapshots (ADR-0002 in
+	// lucos_backups). A per-volume opt-in, not an estate default.
+	pub backup_strategy: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

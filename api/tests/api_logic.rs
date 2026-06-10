@@ -48,6 +48,7 @@ system3:
 vol1:
   description: Volume 1
   recreate_effort: Low
+  backup_strategy: incremental
 vol2:
   description: Volume 2
   skip_backup: true
@@ -693,6 +694,7 @@ async fn test_all_turtle_contains_volumes() {
 	assert!(body.contains("/volumes#vol1>"));
 	assert!(body.contains("a configy:Volume"));
 	assert!(body.contains("configy:recreateEffort \"Low\""));
+	assert!(body.contains("configy:backupStrategy \"incremental\""));
 	assert!(body.contains("configy:skipBackup true"));
 }
 
