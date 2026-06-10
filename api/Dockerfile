@@ -8,7 +8,7 @@ COPY Cargo.toml ./
 COPY src ./src
 RUN cargo build --release
 
-FROM alpine:3.23
+FROM alpine:3.24
 ARG VERSION
 ENV VERSION=$VERSION
 
