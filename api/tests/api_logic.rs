@@ -48,6 +48,7 @@ system3:
 vol1:
   description: Volume 1
   recreate_effort: Low
+  backup_strategy: incremental
 vol2:
   description: Volume 2
   skip_backup: true
@@ -201,7 +202,16 @@ async fn test_volumes_all() {
 	assert_eq!(response.status(), StatusCode::OK);
 	let body = response.into_body().collect().await.unwrap().to_bytes();
 	let body: serde_json::Value = serde_json::from_slice(&body).unwrap();
-	assert_eq!(body.as_array().unwrap().len(), 2);
+	let volumes = body.as_array().unwrap();
+	assert_eq!(volumes.len(), 2);
+
+	// backup_strategy must appear on the /volumes endpoint (not just /all turtle),
+	// with the default ("full-snapshot") served explicitly by configy for volumes
+	// that don't set it — so consumers never have to know the default.
+	let vol1 = volumes.iter().find(|v| v["id"] == "vol1").unwrap();
+	let vol2 = volumes.iter().find(|v| v["id"] == "vol2").unwrap();
+	assert_eq!(vol1["backup_strategy"], "incremental");
+	assert_eq!(vol2["backup_strategy"], "full-snapshot");
 }
 
 #[tokio::test]
@@ -693,6 +703,7 @@ async fn test_all_turtle_contains_volumes() {
 	assert!(body.contains("/volumes#vol1>"));
 	assert!(body.contains("a configy:Volume"));
 	assert!(body.contains("configy:recreateEffort \"Low\""));
+	assert!(body.contains("configy:backupStrategy \"incremental\""));
 	assert!(body.contains("configy:skipBackup true"));
 }
 
