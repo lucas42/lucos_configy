@@ -167,9 +167,7 @@ fn turtle_volumes(volumes: &[Volume], base: &str) -> String {
 		if let Some(effort) = &volume.recreate_effort {
 			out.push_str(&format!(" ;\n    configy:recreateEffort \"{}\"", escape_turtle_literal(effort)));
 		}
-		if let Some(strategy) = &volume.backup_strategy {
-			out.push_str(&format!(" ;\n    configy:backupStrategy \"{}\"", escape_turtle_literal(strategy)));
-		}
+		out.push_str(&format!(" ;\n    configy:backupStrategy \"{}\"", escape_turtle_literal(&volume.backup_strategy)));
 		if volume.skip_backup {
 			out.push_str(" ;\n    configy:skipBackup true");
 		}

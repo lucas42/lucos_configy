@@ -6,6 +6,7 @@ use std::vec::Vec;
 use std::path::Path;
 
 fn default_true() -> bool { true }
+fn default_full_snapshot() -> String { "full-snapshot".to_string() }
 
 /// Custom deserializer that rejects port 0 (valid TCP ports are 1–65535).
 fn validate_port<'de, D>(deserializer: D) -> Result<u16, D::Error>
@@ -64,10 +65,13 @@ pub struct Volume {
 	#[serde(default)]
 	pub skip_backup_on_hosts: Vec<String>,
 	// Which backup mechanism lucos_backups uses for this volume.
-	// Absent / "full-snapshot" = the default daily full tar+scp; "incremental"
-	// opts into rsync --link-dest hardlink-rotated snapshots (ADR-0002 in
-	// lucos_backups). A per-volume opt-in, not an estate default.
-	pub backup_strategy: Option<String>,
+	// "full-snapshot" (the default, owned here in configy) = the daily full
+	// tar+scp; "incremental" opts into rsync --link-dest hardlink-rotated
+	// snapshots (ADR-0002 in lucos_backups). A per-volume opt-in, not an estate
+	// default. Always serialised with an explicit value so consumers never have
+	// to know the default themselves.
+	#[serde(default = "default_full_snapshot")]
+	pub backup_strategy: String,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

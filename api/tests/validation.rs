@@ -98,29 +98,27 @@ fn recreate_effort_is_present_and_recognised() {
 
 /// Recognised `backup_strategy` ids. The canonical source of truth is
 /// `lucos_backups` (ADR-0002), which selects a backup mechanism per volume from
-/// this field. `backup_strategy` is optional (absent ⇒ the default
-/// `full-snapshot`), but a *present* value that lucos_backups doesn't recognise
-/// would silently fall back to full-snapshot — quietly defeating the opt-in — so
-/// guard it here the same way `recreate_effort` is guarded. If lucos_backups adds
-/// a new strategy, update this constant in lockstep.
+/// this field. The field defaults to `full-snapshot` in configy (so the API
+/// always serves an explicit value), but a value `lucos_backups` doesn't
+/// recognise would silently fall back to full-snapshot — quietly defeating the
+/// opt-in — so guard it here the same way `recreate_effort` is guarded. If
+/// lucos_backups adds a new strategy, update this constant in lockstep.
 const RECOGNISED_BACKUP_STRATEGIES: [&str; 2] = [
 	"full-snapshot",
 	"incremental",
 ];
 
 #[test]
-fn backup_strategy_is_recognised_when_present() {
+fn backup_strategy_is_recognised() {
 	let data = load_test_data();
 
 	for volume in data.get_volumes() {
 		let id = volume.id.as_deref().unwrap_or("<unknown>");
-		if let Some(strategy) = &volume.backup_strategy {
-			assert!(
-				RECOGNISED_BACKUP_STRATEGIES.contains(&strategy.as_str()),
-				"Volume {:?} has unrecognised backup_strategy {:?}; it must be one of {:?} (or omitted for the default full-snapshot)",
-				id, strategy, RECOGNISED_BACKUP_STRATEGIES
-			);
-		}
+		assert!(
+			RECOGNISED_BACKUP_STRATEGIES.contains(&volume.backup_strategy.as_str()),
+			"Volume {:?} has unrecognised backup_strategy {:?}; it must be one of {:?}",
+			id, volume.backup_strategy, RECOGNISED_BACKUP_STRATEGIES
+		);
 	}
 }
 

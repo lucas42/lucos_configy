@@ -101,6 +101,16 @@ lucos_mail:
         - { port: 587, protocol: tcp, purpose: "SMTP submission" }
 ```
 
+## Volume fields
+
+| Field | Type | Description |
+|---|---|---|
+| `description` | string (optional) | Human-readable description of what the volume holds. |
+| `recreate_effort` | string (optional) | How hard the data is to recreate if lost (e.g. `small`, `considerable`, `huge`, `automatic`). Recognised values are validated against `lucos_backups`. |
+| `skip_backup` | boolean (default: false) | When true, `lucos_backups` does not back this volume up at all. |
+| `skip_backup_on_hosts` | list of strings (default: []) | Hosts to exclude as backup *destinations* for this volume. |
+| `backup_strategy` | string (default: `full-snapshot`) | Backup mechanism `lucos_backups` uses for this volume: `full-snapshot` (daily full tar+scp) or `incremental` (rsync `--link-dest` hardlink-rotated snapshots, for large append-mostly media volumes). See ADR-0002 in `lucos_backups`. |
+
 ## Updating the data
 Edit YAML files in the `config` directory.
 Commit the change to the main branch and push to github.
