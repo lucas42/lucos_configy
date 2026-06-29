@@ -10,9 +10,6 @@ lucos_arachne_typesense_data:
     description: Data from the arachne search index, gathered from other lucOS systems
     recreate_effort: automatic
     skip_backup: true
-lucos_authentication_config:
-    description: Configuration Data for authentication
-    recreate_effort: small
 lucos_contacts_db_data:
     description: Personal data about contacts
     recreate_effort: huge
