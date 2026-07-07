@@ -108,3 +108,9 @@ lucos_static_media_public:
     description: Remote volume on NAS
     recreate_effort: remote
     skip_backup: true
+lucos_worlds_db_data:
+    description: MariaDB data for the BookStack worldbuilding app — hand-authored player character, NPC and place content
+    recreate_effort: huge
+lucos_worlds_web_storage:
+    description: BookStack uploaded images and attachments for lucos_worlds
+    recreate_effort: considerable

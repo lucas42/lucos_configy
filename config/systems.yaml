@@ -185,6 +185,12 @@ lucos_time:
     http_port: 8008
     hosts:
         - avalon
+lucos_worlds:
+    domain: worlds.l42.eu
+    http_port: 8040
+    hosts:
+        - avalon
+    unsupervisedAgentCode: true
 lukeblaney_blog:
     domain: blog.lukeblaney.co.uk
     http_port: 8037
