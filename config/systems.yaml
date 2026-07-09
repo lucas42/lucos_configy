@@ -191,6 +191,14 @@ lucos_worlds:
     hosts:
         - avalon
     unsupervisedAgentCode: true
+# lucos_worlds_atlas: not deployed yet (pre-scaffolding, README-only as of
+# 2026-07-09 — see lucas42/lucos_worlds_atlas#1). Deliberately no domain,
+# http_port, or hosts: those fields are what make a system visible to
+# lucos_monitoring's HTTP/_info checks (/systems/http) and CircleCI checks
+# read the full /systems list but treat a repo with no CircleCI project as a
+# benign no-op, so this entry alone won't page anyone. Add domain/http_port/
+# hosts once it's actually deployed.
+lucos_worlds_atlas:
 lukeblaney_blog:
     domain: blog.lukeblaney.co.uk
     http_port: 8037
