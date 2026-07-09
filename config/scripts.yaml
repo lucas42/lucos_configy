@@ -11,6 +11,10 @@ lucos_agent_coding_sandbox:
     unsupervisedAgentCode: true
 lucos_antigravity_config:
     unsupervisedAgentCode: true
+# lucos_architecture_models is a docs/generated-data output sink (no executable
+# artifact, no CI) — not a system or component, and doesn't warrant its own
+# type. See lucas42/lucos_architecture_models#3.
+lucos_architecture_models:
 lucos_claude_config:
     unsupervisedAgentCode: true
 lucos_contacts_fb_import:
