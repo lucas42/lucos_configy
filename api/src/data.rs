@@ -72,6 +72,10 @@ pub struct Volume {
 	// to know the default themselves.
 	#[serde(default = "default_full_snapshot")]
 	pub backup_strategy: String,
+	// Whether lucos_backups pauses the volume's running writers during its local
+	// read, so the copy is one point in time rather than a smear (lucos_backups#344).
+	#[serde(default)]
+	pub quiesce: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
