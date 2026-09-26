@@ -110,6 +110,7 @@ lucos_mail:
 | `skip_backup` | boolean (default: false) | When true, `lucos_backups` does not back this volume up at all. |
 | `skip_backup_on_hosts` | list of strings (default: []) | Hosts to exclude as backup *destinations* for this volume. |
 | `backup_strategy` | string (default: `full-snapshot`) | Backup mechanism `lucos_backups` uses for this volume: `full-snapshot` (daily full tar+scp) or `incremental` (rsync `--link-dest` hardlink-rotated snapshots, for large append-mostly media volumes). See ADR-0002 in `lucos_backups`. |
+| `quiesce` | boolean (default: false) | When true, `lucos_backups` pauses the containers writing to this volume for the duration of its fast local read, so the copy is a single point in time rather than a smear across a live write. Set it on volumes mutated in place by a running writer (databases); leave it off for append-only media. Not supported with `backup_strategy: incremental`. See ADR-0002 in `lucos_backups`. |
 
 ## Updating the data
 Edit YAML files in the `config` directory.

@@ -122,6 +122,24 @@ fn backup_strategy_is_recognised() {
 	}
 }
 
+/// lucos_backups only quiesces the fast local read of a `full-snapshot` volume.
+/// An `incremental` volume rsyncs straight from the live volume across the WAN,
+/// so quiescing it would freeze its writers for the whole transfer — lucos_backups
+/// refuses the combination at runtime (#344); fail it here, before it deploys.
+#[test]
+fn quiesce_is_not_combined_with_incremental() {
+	let data = load_test_data();
+
+	for volume in data.get_volumes() {
+		let id = volume.id.as_deref().unwrap_or("<unknown>");
+		assert!(
+			!(volume.quiesce && volume.backup_strategy == "incremental"),
+			"Volume {:?} sets quiesce: true with backup_strategy: incremental, which lucos_backups does not support",
+			id
+		);
+	}
+}
+
 #[test]
 fn config_files_are_sorted_alphabetically() {
 	let config_files = ["systems.yaml", "volumes.yaml", "hosts.yaml", "components.yaml", "scripts.yaml"];

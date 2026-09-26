@@ -57,6 +57,7 @@ fn turtle_ontology() -> String {
 		("backupStrategy", "Backup Strategy", "configy:Volume", "xsd:string"),
 		("skipBackup", "Skip Backup", "configy:Volume", "xsd:boolean"),
 		("skipBackupOnHost", "Skip Backup On Host", "configy:Volume", "configy:Host"),
+		("quiesce", "Quiesce", "configy:Volume", "xsd:boolean"),
 		("publicPort", "Public Port", "configy:System", "configy:PublicPort"),
 		("portNumber", "Port Number", "configy:PublicPort", "xsd:integer"),
 		("portProtocol", "Port Protocol", "configy:PublicPort", "xsd:string"),
@@ -173,6 +174,9 @@ fn turtle_volumes(volumes: &[Volume], base: &str) -> String {
 		}
 		for host in &volume.skip_backup_on_hosts {
 			out.push_str(&format!(" ;\n    configy:skipBackupOnHost <{base}/hosts#{host}>"));
+		}
+		if volume.quiesce {
+			out.push_str(" ;\n    configy:quiesce true");
 		}
 		out.push_str(" .\n");
 	}
