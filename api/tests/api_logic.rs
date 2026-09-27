@@ -52,6 +52,7 @@ vol1:
 vol2:
   description: Volume 2
   skip_backup: true
+  pause_during_backup: true
 ").unwrap();
 
 	let hosts_path = dir.path().join("hosts.yaml");
@@ -212,6 +213,10 @@ async fn test_volumes_all() {
 	let vol2 = volumes.iter().find(|v| v["id"] == "vol2").unwrap();
 	assert_eq!(vol1["backup_strategy"], "incremental");
 	assert_eq!(vol2["backup_strategy"], "full-snapshot");
+
+	// pause_during_backup is always served explicitly too — an absent key must read as false.
+	assert_eq!(vol1["pause_during_backup"], false);
+	assert_eq!(vol2["pause_during_backup"], true);
 }
 
 #[tokio::test]
@@ -705,6 +710,8 @@ async fn test_all_turtle_contains_volumes() {
 	assert!(body.contains("configy:recreateEffort \"Low\""));
 	assert!(body.contains("configy:backupStrategy \"incremental\""));
 	assert!(body.contains("configy:skipBackup true"));
+	assert!(body.contains("configy:pauseDuringBackup true"));
+	assert!(body.contains("configy:pauseDuringBackup\n    a rdf:Property"));
 }
 
 #[tokio::test]
