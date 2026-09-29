@@ -10,6 +10,16 @@ lucos_arachne_typesense_data:
     description: Data from the arachne search index, gathered from other lucOS systems
     recreate_effort: automatic
     skip_backup: true
+lucos_campaigns_db_data:
+    description: MariaDB data for the Kanka campaign manager — hand-authored campaign content
+    recreate_effort: huge
+lucos_campaigns_search_data:
+    description: Meilisearch index for Kanka, rebuilt from the database with `artisan setup:meilisearch`
+    recreate_effort: automatic
+    skip_backup: true
+lucos_campaigns_storage:
+    description: Kanka uploads on the public disk, plus the Passport OAuth keys (API tokens stop validating without them)
+    recreate_effort: considerable
 lucos_contacts_db_data:
     description: Personal data about contacts
     recreate_effort: huge
