@@ -117,6 +117,14 @@ Edit YAML files in the `config` directory.
 Commit the change to the main branch and push to github.
 The updated API will be automatically deployed.
 
+The API is live once configy's own deploy restarts it, a few minutes after the merge. Its consumers then each pick up the change on their own schedule, and some need a manual step. For a **new system**, do these in order:
+
+1. **Credentials, before the system's first deploy.** `lucos_creds`' configy sync writes `PORT` and `APP_ORIGIN` for `development` and `production`, but only hourly at :53. A deploy that runs first gets an empty `PORT` and fails. Wait for the :53 run, or have lucas42 set both in production by hand. A `Credential PORT updated in <system> (production)` event in loganne confirms it.
+2. **DNS: automatic.** `lucos_dns` syncs every 15 minutes and adds `<domain>` as a CNAME to `<host>.s.l42.eu`.
+3. **Router and TLS: manual, once DNS resolves.** `lucos_router` reads configy only when it starts and at 22:16 UTC daily. Until then the domain gets the host's default certificate. Run `docker exec lucos_router update-domains.sh` on each host listed in `hosts`. That issues the certificate and reloads nginx, with no restart.
+4. **Monitoring: manual rebuild, once `/_info` serves.** `lucos_monitoring` takes its list of systems from configy at image build time, so restarting it does nothing. Trigger a `main` pipeline for lucos_monitoring. Do this only once the system's `/_info` answers, or it goes straight to red.
+5. **Automatic, no action needed:** `lucos_backups` re-reads volumes hourly at :03. Its `volume-host` check fails until the new volumes exist on the host. `lucos_root` rereads configy every 5 minutes and adds the homepage tile once `/_info` answers. The code-reviewer auto-merge workflow reads `unsupervisedAgentCode` per PR, and `lucos_repos` reads configy at the start of each 6-hourly sweep. `lucos_firewall` reads `public_ports`.
+
 ## Running tests
 Tests are located in the `api` directory.
 
