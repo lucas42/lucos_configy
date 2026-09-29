@@ -15,6 +15,12 @@ lucos_backups:
     http_port: 8027
     hosts:
         - avalon
+lucos_campaigns:
+    domain: campaigns.l42.eu
+    http_port: 8041
+    hosts:
+        - avalon
+    unsupervisedAgentCode: true
 lucos_configy:
     domain: configy.l42.eu
     http_port: 8034
