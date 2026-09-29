@@ -20,6 +20,7 @@ lucos_campaigns:
     http_port: 8041
     hosts:
         - avalon
+    unsupervisedAgentCode: true
 lucos_configy:
     domain: configy.l42.eu
     http_port: 8034
