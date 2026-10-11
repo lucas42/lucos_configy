@@ -2,6 +2,7 @@
 lucos_aithne_credential_store:
     description: SQLite credential and principal store for lucos_aithne — holds passkey credentials and principal records
     recreate_effort: considerable
+    pause_during_backup: true
 lucos_arachne_fuseki_data:
     description: Data from the arachne triple store, gathered from other lucOS systems
     recreate_effort: automatic
@@ -13,6 +14,7 @@ lucos_arachne_typesense_data:
 lucos_campaigns_db_data:
     description: MariaDB data for the Kanka campaign manager — hand-authored campaign content
     recreate_effort: huge
+    pause_during_backup: true
 lucos_campaigns_search_data:
     description: Meilisearch index for Kanka, rebuilt from the database with `artisan setup:meilisearch`
     recreate_effort: automatic
@@ -23,9 +25,11 @@ lucos_campaigns_storage:
 lucos_contacts_db_data:
     description: Personal data about contacts
     recreate_effort: huge
+    pause_during_backup: true
 lucos_creds_store:
     description: Credentials used by lucos services.  Both between services within lucos and to third party services.
     recreate_effort: considerable
+    pause_during_backup: true
 lucos_dns_configy-sync-cache:
     description: Last-known-good configy payload for config-sync, used as fallback when configy is unreachable during a DNS outage
     recreate_effort: automatic
@@ -48,6 +52,7 @@ lucos_docker_mirror_logs:
 lucos_eolas_db_data:
     description: Personally curated knowledge graph, including concepts like people, places & events
     recreate_effort: huge
+    pause_during_backup: true
 lucos_locations_config:
     description: Configuration for OwnTracks Recorder
     recreate_effort: automatic
@@ -76,6 +81,7 @@ lucos_media_manager_stateFile:
 lucos_media_metadata_api_db:
     description: Data about media files
     recreate_effort: huge
+    pause_during_backup: true
 lucos_media_metadata_api_exports:
     description: Automated exports of media metadata
     recreate_effort: automatic
@@ -92,6 +98,7 @@ lucos_photos_photos:
 lucos_photos_postgres_data:
     description: Relational metadata including manually curated face and person associations
     recreate_effort: considerable
+    pause_during_backup: true
 lucos_photos_redis_data:
     description: Internal job queue for photo processing tasks
     recreate_effort: automatic
@@ -105,6 +112,7 @@ lucos_private_medlib:
 lucos_repos_data:
     description: SQLite database for lucos_repos convention auditor
     recreate_effort: automatic
+    pause_during_backup: true
 lucos_router_generatedconfig:
     description: Routing configuration
     recreate_effort: automatic
@@ -114,6 +122,7 @@ lucos_router_letsencrypt:
 lucos_schedule_tracker_db:
     description: Recent results of scheduled jobs
     recreate_effort: automatic
+    pause_during_backup: true
 lucos_static_media_public:
     description: Remote volume on NAS
     recreate_effort: remote
@@ -121,6 +130,7 @@ lucos_static_media_public:
 lucos_worlds_db_data:
     description: MariaDB data for the BookStack worldbuilding app — hand-authored player character, NPC and place content
     recreate_effort: huge
+    pause_during_backup: true
 lucos_worlds_web_storage:
     description: BookStack uploaded images and attachments for lucos_worlds
     recreate_effort: considerable
